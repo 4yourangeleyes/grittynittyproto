@@ -346,6 +346,7 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
           </div>
         </div>
         <div className="flex gap-2">
+          <button onClick={() => setShowAddMenu(true)} className="px-4 py-2 border-2 border-grit-dark bg-grit-secondary hover:bg-grit-dark hover:text-white transition-colors font-bold flex items-center gap-2"><Plus size={18}/>Add Block</button>
           <button onClick={handleSave} className="px-4 py-2 border-2 border-grit-dark bg-grit-primary hover:bg-grit-dark hover:text-white transition-colors font-bold flex items-center gap-2"><Save size={18}/>Save</button>
           <button onClick={handleShare} className="px-4 py-2 border-2 border-grit-dark hover:bg-black hover:text-white transition-colors font-bold flex items-center gap-2"><Share2 size={18}/>Share</button>
           <div className="relative">

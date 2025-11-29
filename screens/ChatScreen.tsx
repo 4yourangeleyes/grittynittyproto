@@ -311,10 +311,19 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
                                                        <div className="font-bold text-sm text-grit-primary uppercase tracking-wide">{t.name}</div>
                                                        {t.items && t.items.length > 0 && (
                                                            <button
-                                                               onClick={() => addAllItemsFromTemplate(t)}
+                                                               onClick={() => {
+                                                                   // Select all items from this template
+                                                                   const newSelected = new Set(selectedTemplateItems);
+                                                                   t.items.forEach(item => {
+                                                                       const key = `${t.id}-${item.id}`;
+                                                                       newSelected.add(key);
+                                                                   });
+                                                                   setSelectedTemplateItems(newSelected);
+                                                                   triggerHaptic('light');
+                                                               }}
                                                                className="text-xs font-bold bg-grit-secondary text-white px-3 py-1 rounded hover:bg-grit-dark transition-colors"
                                                            >
-                                                               Add All
+                                                               Select All
                                                            </button>
                                                        )}
                                                    </div>
