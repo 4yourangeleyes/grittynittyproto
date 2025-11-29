@@ -327,43 +327,7 @@ const SettingsScreen: React.FC<SettingsProps> = ({ clients, setClients, template
     triggerHaptic('success');
   };
 
-  const handleAddClient = async () => {
-      if (!newClientName || !newClientEmail) { alert("Required fields missing."); return; }
-      
-      const clientData: Client = {
-        id: editingClientId || Date.now().toString(),
-        businessName: newClientName,
-        registrationNumber: newClientReg,
-        email: newClientEmail,
-        phone: newClientPhone,
-        address: newClientAddress
-      };
 
-      try {
-        await saveClient(clientData);
-        triggerHaptic('success');
-        setIsAddingClient(false); 
-        setEditingClientId(null); 
-        setNewClientName(''); 
-        setNewClientReg(''); 
-        setNewClientEmail(''); 
-        setNewClientPhone(''); 
-        setNewClientAddress('');
-      } catch (error) {
-        console.error("Failed to save client", error);
-        alert("Failed to save client. Please try again.");
-      }
-  };
-
-  const startEditClient = (client: Client) => {
-    setNewClientName(client.businessName);
-    setNewClientReg(client.registrationNumber || '');
-    setNewClientEmail(client.email);
-    setNewClientPhone(client.phone || '');
-    setNewClientAddress(client.address || '');
-    setEditingClientId(client.id);
-    setIsAddingClient(true);
-  };
 
   // Show loading state only briefly while profile is being fetched
   if (isLoadingProfile) {
@@ -671,85 +635,7 @@ const SettingsScreen: React.FC<SettingsProps> = ({ clients, setClients, template
                         <div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setIsAddingTemplate(false)}>Cancel</Button><Button onClick={handleAddTemplate}>Save</Button></div></div></div>}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{templates.map(t => <div key={t.id} className="bg-white border-2 border-gray-200 p-4 relative group hover:border-grit-dark"><button onClick={() => setTemplates(ts => ts.filter(x => x.id !== t.id))} className="absolute top-2 right-2 text-gray-300 hover:text-red-500"><Trash2 size={16}/></button><div className="flex justify-between"><span className="text-xs font-bold bg-blue-100 px-2 py-1">{t.type}</span><span className="text-xs uppercase text-gray-400">{t.category}</span></div><h3 className="font-bold text-lg">{t.name}</h3></div>)}</div></div>
             )}
-             {activeTab === 'clients' && (
-                <div className="space-y-8 animate-in fade-in">
-                    <div className="flex justify-between items-center border-b-4 border-grit-secondary pb-4">
-                        <h2 className="text-3xl font-bold">Clients</h2>
-                        <Button size="sm" onClick={() => { setEditingClientId(null); setNewClientName(''); setNewClientReg(''); setNewClientEmail(''); setNewClientPhone(''); setNewClientAddress(''); setIsAddingClient(true); }} icon={<Plus size={18}/>}>New Client</Button>
-                    </div>
-                    
-                    <div className="bg-purple-50 border-2 border-purple-200 p-4 rounded-lg mb-6">
-                        <div className="flex items-center gap-2">
-                            <Edit2 size={18} className="text-purple-600" />
-                            <p className="text-sm text-purple-700 font-bold">Edit client information directly in the cards below</p>
-                        </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                        {clients.map(c => (
-                            <div key={c.id} className="bg-white border-2 border-gray-300 p-6 hover:border-purple-500 hover:shadow-grit transition-all">
-                                <div className="grid gap-4">
-                                    <Input 
-                                        label="Business Name" 
-                                        value={c.businessName} 
-                                        onChange={e => setClients(prev => prev.map(x => x.id === c.id ? { ...x, businessName: e.target.value } : x))} 
-                                        onBlur={() => saveClient(c)}
-                                    />
-                                    <Input 
-                                        label="Email" 
-                                        type="email"
-                                        value={c.email} 
-                                        onChange={e => setClients(prev => prev.map(x => x.id === c.id ? { ...x, email: e.target.value } : x))} 
-                                        onBlur={() => saveClient(c)}
-                                    />
-                                    <Input 
-                                        label="Phone" 
-                                        value={c.phone || ''} 
-                                        onChange={e => setClients(prev => prev.map(x => x.id === c.id ? { ...x, phone: e.target.value } : x))} 
-                                        onBlur={() => saveClient(c)}
-                                    />
-                                    <Input 
-                                        label="Registration Number" 
-                                        value={c.registrationNumber || ''} 
-                                        onChange={e => setClients(prev => prev.map(x => x.id === c.id ? { ...x, registrationNumber: e.target.value } : x))} 
-                                        onBlur={() => saveClient(c)}
-                                    />
-                                    <TextArea 
-                                        label="Address" 
-                                        value={c.address || ''} 
-                                        onChange={e => setClients(prev => prev.map(x => x.id === c.id ? { ...x, address: e.target.value } : x))} 
-                                        onBlur={() => saveClient(c)}
-                                    />
-                                    <div className="flex justify-end">
-                                        <Button size="sm" variant="outline" onClick={async () => {
-                                            if(window.confirm('Delete this client?')) {
-                                                await deleteClient(c.id);
-                                            }
-                                        }} icon={<Trash2 size={16}/>}>Delete</Button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                        
-                        {isAddingClient && (
-                            <div className="bg-gray-100 border-2 border-grit-dark p-6">
-                                <h3 className="font-bold mb-4 text-lg">New Client</h3>
-                                <div className="grid gap-4">
-                                    <Input label="Business Name" value={newClientName} onChange={e => setNewClientName(e.target.value)} placeholder="Client business name" />
-                                    <Input label="Email" type="email" value={newClientEmail} onChange={e => setNewClientEmail(e.target.value)} placeholder="client@email.com" />
-                                    <Input label="Phone" value={newClientPhone} onChange={e => setNewClientPhone(e.target.value)} placeholder="Phone number" />
-                                    <Input label="Registration Number" value={newClientReg} onChange={e => setNewClientReg(e.target.value)} placeholder="Reg or tax number" />
-                                    <TextArea label="Address" value={newClientAddress} onChange={e => setNewClientAddress(e.target.value)} placeholder="Full address" />
-                                    <div className="flex justify-end gap-2">
-                                        <Button variant="outline" onClick={() => { setIsAddingClient(false); setEditingClientId(null); }}>Cancel</Button>
-                                        <Button onClick={handleAddClient}>Save Client</Button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
+
             {activeTab === 'diagnostics' && (
                 <div className="space-y-8 animate-in fade-in">
                     <h2 className="text-3xl font-bold border-b-4 border-grit-secondary pb-4 inline-block">System Diagnostics</h2>

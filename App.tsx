@@ -371,7 +371,7 @@ const AppRoutes: React.FC<any> = (props) => {
             } />
 
             <Route path="/documents" element={!isAuthenticated ? <Navigate to="/login" replace /> : <DocumentsScreen documents={documents} openDocument={props.setCurrentDoc} />} />
-            <Route path="/clients" element={!isAuthenticated ? <Navigate to="/login" replace /> : <ClientsScreen clients={clients} documents={documents} deleteClient={deleteClient} />} />
+            <Route path="/clients" element={!isAuthenticated ? <Navigate to="/login" replace /> : <ClientsScreen clients={clients} documents={documents} saveClient={saveClient} deleteClient={deleteClient} />} />
             <Route path="/settings" element={!isAuthenticated ? <Navigate to="/login" replace /> : <SettingsScreen clients={clients} setClients={setClients} templates={props.templates} setTemplates={props.setTemplates} saveClient={saveClient} deleteClient={deleteClient} />} />
           </Routes>
         </Suspense>

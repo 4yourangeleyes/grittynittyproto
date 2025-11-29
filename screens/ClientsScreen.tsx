@@ -1,16 +1,53 @@
 import React, { useState } from 'react';
 import { Client, DocumentData } from '../types';
-import { Search, FileText, Mail, MapPin, Phone, Trash2 } from 'lucide-react';
-import { Input } from '../components/Input';
+import { Search, FileText, Mail, MapPin, Phone, Trash2, Plus, X } from 'lucide-react';
+import { Input, TextArea } from '../components/Input';
+import { Button } from '../components/Button';
 
 interface ClientsScreenProps {
     clients: Client[];
     documents: DocumentData[];
+    saveClient: (client: Client) => Promise<any>;
     deleteClient: (id: string) => Promise<void>;
 }
 
-const ClientsScreen: React.FC<ClientsScreenProps> = ({ clients, documents, deleteClient }) => {
+const ClientsScreen: React.FC<ClientsScreenProps> = ({ clients, documents, saveClient, deleteClient }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAddingClient, setIsAddingClient] = useState(false);
+  const [newClientName, setNewClientName] = useState('');
+  const [newClientEmail, setNewClientEmail] = useState('');
+  const [newClientPhone, setNewClientPhone] = useState('');
+  const [newClientReg, setNewClientReg] = useState('');
+  const [newClientAddress, setNewClientAddress] = useState('');
+
+  const handleAddClient = async () => {
+    if (!newClientName || !newClientEmail) {
+      alert('Business name and email are required.');
+      return;
+    }
+
+    const newClient: Client = {
+      id: crypto.randomUUID(),
+      businessName: newClientName,
+      email: newClientEmail,
+      phone: newClientPhone,
+      registrationNumber: newClientReg,
+      address: newClientAddress,
+    };
+
+    try {
+      await saveClient(newClient);
+      setIsAddingClient(false);
+      setNewClientName('');
+      setNewClientEmail('');
+      setNewClientPhone('');
+      setNewClientReg('');
+      setNewClientAddress('');
+    } catch (error) {
+      console.error('Failed to create client:', error);
+      alert('Failed to create client. Please try again.');
+    }
+  };
 
   const filteredClients = clients.filter(c => 
     c.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -28,16 +65,67 @@ const ClientsScreen: React.FC<ClientsScreenProps> = ({ clients, documents, delet
                 <h1 className="text-4xl font-bold mb-2">Clients</h1>
                 <p className="text-gray-500 font-medium">Manage your relationships and view history.</p>
             </div>
-            <div className="w-full md:w-1/3 relative">
-                <Search className="absolute left-3 top-3.5 text-gray-400" size={20}/>
-                <Input 
-                    placeholder="Search clients..." 
-                    className="pl-10"
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                />
+            <div className="flex gap-4 items-center">
+                <div className="w-full md:w-auto relative">
+                    <Search className="absolute left-3 top-3.5 text-gray-400" size={20}/>
+                    <Input 
+                        placeholder="Search clients..." 
+                        className="pl-10"
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <Button onClick={() => setIsAddingClient(true)} icon={<Plus size={18}/>}>New Client</Button>
             </div>
         </div>
+
+        {isAddingClient && (
+            <div className="bg-gray-100 border-2 border-grit-dark p-6 mb-6">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-bold text-xl">New Client</h3>
+                    <button onClick={() => setIsAddingClient(false)} className="text-gray-400 hover:text-gray-600">
+                        <X size={20} />
+                    </button>
+                </div>
+                <div className="grid gap-4">
+                    <Input 
+                        label="Business Name" 
+                        value={newClientName} 
+                        onChange={e => setNewClientName(e.target.value)} 
+                        placeholder="Client business name" 
+                    />
+                    <Input 
+                        label="Email" 
+                        type="email"
+                        value={newClientEmail} 
+                        onChange={e => setNewClientEmail(e.target.value)} 
+                        placeholder="client@email.com" 
+                    />
+                    <Input 
+                        label="Phone" 
+                        value={newClientPhone} 
+                        onChange={e => setNewClientPhone(e.target.value)} 
+                        placeholder="Phone number" 
+                    />
+                    <Input 
+                        label="Registration Number" 
+                        value={newClientReg} 
+                        onChange={e => setNewClientReg(e.target.value)} 
+                        placeholder="Reg or tax number" 
+                    />
+                    <TextArea 
+                        label="Address" 
+                        value={newClientAddress} 
+                        onChange={e => setNewClientAddress(e.target.value)} 
+                        placeholder="Full address" 
+                    />
+                    <div className="flex justify-end gap-2">
+                        <Button variant="outline" onClick={() => setIsAddingClient(false)}>Cancel</Button>
+                        <Button onClick={handleAddClient}>Save Client</Button>
+                    </div>
+                </div>
+            </div>
+        )}
 
         {filteredClients.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
