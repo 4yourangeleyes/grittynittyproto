@@ -242,10 +242,14 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
     </div>
   );
 
+  // BAUHAUS-INSPIRED EDITORIAL THEME - Primary balance, geometric clarity, functional beauty
   const renderGeometricTheme = () => (
     <div className="p-[15mm] min-h-full flex flex-col font-sans bg-[#FDFBF6] text-black relative overflow-hidden">
+      {/* Bauhaus geometric elements - primary colors, pure forms */}
       <div className="absolute top-[15mm] left-0 w-[10mm] h-[100mm] bg-[#E91E63]"></div>
       <div className="absolute bottom-[30mm] right-[30mm] w-[45mm] h-[45mm] bg-[#FFC107] rounded-full mix-blend-multiply opacity-70"></div>
+      <div className="absolute top-[120mm] right-[15mm] w-[30mm] h-[30mm] border-4 border-[#2196F3] rotate-45"></div>
+      
       <header className="flex justify-between items-start mb-24 relative z-10">
         <div className="pl-[20mm]">
           {viewMode === 'Draft' ?
@@ -262,6 +266,7 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
           <p className="font-mono text-sm mt-2 text-gray-800">No. {doc.id.slice(-6)}</p>
         </div>
       </header>
+      
       <section className="grid grid-cols-2 gap-12 mb-16 relative z-10">
         <div className="border-t-4 border-black pt-4">
           <p className="font-bold uppercase tracking-widest text-xs mb-3">Bill To</p>
@@ -274,26 +279,57 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
           {doc.dueDate && <p className="text-sm mt-2 font-bold text-red-500">Due: {doc.dueDate}</p>}
         </div>
       </section>
+      
       <main className="flex-1 relative z-10">
         <table className="w-full text-left">
-          <thead><tr className="border-b-4 border-black">{viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}<th className="pb-3 font-bold uppercase tracking-wider text-sm text-center w-20">Qty</th><th className="pb-3 font-bold uppercase tracking-wider text-sm text-center w-20">Unit</th><th className="pb-3 font-bold uppercase tracking-wider text-sm">Description</th><th className="pb-3 font-bold uppercase tracking-wider text-sm text-right">Unit Price</th><th className="pb-3 font-bold uppercase tracking-wider text-sm text-right">Amount</th></tr></thead>
+          <thead>
+            <tr className="border-b-4 border-black">
+              {viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}
+              <th className="pb-3 font-bold uppercase tracking-wider text-sm text-center w-20">Qty</th>
+              <th className="pb-3 font-bold uppercase tracking-wider text-sm text-center w-20">Unit</th>
+              <th className="pb-3 font-bold uppercase tracking-wider text-sm">Description</th>
+              <th className="pb-3 font-bold uppercase tracking-wider text-sm text-right">Unit Price</th>
+              <th className="pb-3 font-bold uppercase tracking-wider text-sm text-right">Amount</th>
+            </tr>
+          </thead>
           <tbody>
-            {doc.items?.map((item) => renderRowContent(item, { tr: 'border-b-2 border-gray-300' }))}
-            {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={5} className="py-6 text-center"><button onClick={onAddItem} className="font-bold uppercase text-xs border-2 border-black px-6 py-2 hover:bg-black hover:text-white transition-colors">+ Add Item</button></td></tr>}
+            {Object.entries(groupedItems).map(([blockName, items]: [string, InvoiceItem[]]) => (
+              <React.Fragment key={blockName}>
+                {blockName !== 'Items' && (
+                  <tr>
+                    <td colSpan={viewMode === 'Draft' ? 6 : 5} className="pt-8 pb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-[#E91E63]"></div>
+                        <h3 className="font-black text-base uppercase tracking-widest">{blockName}</h3>
+                        <div className="flex-1 h-[2px] bg-gradient-to-r from-black to-transparent"></div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {items.map((item) => renderRowContent(item, { tr: 'border-b-2 border-gray-300' }))}
+              </React.Fragment>
+            ))}
+            {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-6 text-center"><button onClick={onAddItem} className="font-bold uppercase text-xs border-2 border-black px-6 py-2 hover:bg-black hover:text-white transition-colors">+ Add Item</button></td></tr>}
           </tbody>
         </table>
       </main>
+      
       <footer className="mt-16 flex justify-end relative z-10 flex-wrap">
         {doc.notes && (
           <div className="w-full mb-8 p-4 bg-white border-2 border-gray-300">
+            <p className="text-xs uppercase tracking-wider font-bold mb-2 text-gray-500">Notes</p>
             <p className="text-sm whitespace-pre-wrap text-gray-700">{doc.notes}</p>
           </div>
         )}
         <div className="w-1/2">
           <div className="bg-black text-white p-8">
-            <div className="flex justify-between items-center">
+            <div className="space-y-3 mb-6">
+              <div className="flex justify-between text-sm"><span>Subtotal</span><span className="font-mono">{profile.currency}{doc.subtotal?.toFixed(2)}</span></div>
+              {profile.taxEnabled && <div className="flex justify-between text-sm"><span>{profile.taxName} ({profile.taxRate}%)</span><span className="font-mono">{profile.currency}{doc.taxTotal?.toFixed(2)}</span></div>}
+            </div>
+            <div className="flex justify-between items-center border-t-2 border-white pt-4">
               <div>
-                <p className="font-bold uppercase text-sm mb-2">Total Due</p>
+                <p className="font-bold uppercase text-sm mb-1">Total Due</p>
                 <p className="text-xs text-gray-400">Payment Required</p>
               </div>
               <span className="font-mono font-bold text-4xl">{profile.currency}{doc.total?.toFixed(2)}</span>
@@ -304,153 +340,294 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
     </div>
   );
 
+  // EDITORIAL MAGAZINE THEME - Inspired by Kinfolk, Cereal, Monocle - sophisticated whitespace, editorial hierarchy
   const renderBlueprintTheme = () => (
-    <div className="p-[15mm] min-h-full flex flex-col font-mono text-cyan-100 bg-[#0D1B2A] relative">
-        <div className="absolute inset-0 pointer-events-none opacity-20" style={{ backgroundImage: 'linear-gradient(rgba(224,251,252,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(224,251,252,0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-        <div className="absolute top-0 right-0 p-4 font-barcode text-6xl text-cyan-200/50">*{doc.id.slice(-6)}*</div>
-        <header className="mb-16">
+    <div className="p-[20mm] min-h-full flex flex-col font-serif bg-[#FFFEF9] text-[#2C2C2C]">
+      {/* Elegant serif system with generous spacing */}
+      <header className="mb-32 border-b border-gray-200 pb-12">
+        <div className="flex justify-between items-end">
+          <div className="flex-1">
             {viewMode === 'Draft' ? 
-                <input value={profile.companyName} readOnly className="text-3xl font-bold text-cyan-200 uppercase tracking-[0.2em] bg-transparent w-full focus:bg-cyan-900/50 p-1" placeholder="Company Name" />
-                : <h1 className="text-3xl font-bold text-cyan-200 uppercase tracking-[0.2em]">{profile.companyName}</h1>
+              <input value={profile.companyName} readOnly className="text-2xl font-light tracking-wide bg-transparent w-full focus:bg-amber-50/30 p-1" placeholder="Company Name" />
+              : <h1 className="text-2xl font-light tracking-wide">{profile.companyName}</h1>
             }
-            <p className="text-cyan-400">Engineering & Services Division</p>
-        </header>
-        <section className="grid grid-cols-3 gap-8 border-y-2 border-cyan-200/30 py-4 mb-8">
-            <div><p className="text-xs text-cyan-400 uppercase mb-1">Client</p><input value={doc.client.businessName} onChange={e => updateClient('businessName', e.target.value)} disabled={viewMode === 'Final'} className="text-lg font-bold bg-transparent w-full focus:bg-cyan-900/50 p-1" /></div>
-            <div><p className="text-xs text-cyan-400 uppercase mb-1">Date</p><input value={doc.date} onChange={e => updateDocField('date', e.target.value)} disabled={viewMode === 'Final'} className="text-lg font-bold bg-transparent w-full focus:bg-cyan-900/50 p-1" /></div>
-            <div><p className="text-xs text-cyan-400 uppercase mb-1">Invoice ID</p><p className="text-lg font-bold">INV-{doc.id.slice(-6)}</p></div>
-        </section>
-        <main className="flex-1">
-            <table className="w-full text-left">
-                <thead><tr>{viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}<th className="pb-4 text-cyan-400 uppercase">Item Description</th><th className="pb-4 text-cyan-400 uppercase text-right">Qty</th><th className="pb-4 text-cyan-400 uppercase text-right">Unit Price</th><th className="pb-4 text-cyan-400 uppercase text-right">Total</th></tr></thead>
-                <tbody>
-                    {doc.items?.map((item) => renderRowContent(item, { tr: 'border-b border-cyan-200/20' }))}
-                    {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={5} className="py-6 text-center"><button onClick={onAddItem} className="font-bold text-cyan-200 border-2 border-cyan-200/50 px-4 py-2 hover:bg-cyan-200 hover:text-[#0D1B2A] transition-colors text-xs">+ Add Schematic Item</button></td></tr>}
-                </tbody>
-            </table>
-        </main>
-        <div className="mt-8 pt-4 border-t-2 border-cyan-200/30 grid grid-cols-2 gap-4">
-            <div>
-                {doc.notes && <p className="text-cyan-400 text-sm whitespace-pre-wrap">{doc.notes}</p>}
-            </div>
-            <div className="text-right">
-                {doc.dueDate && <p className="text-cyan-400 text-sm">DUE: {doc.dueDate}</p>}
-            </div>
-        </div>
-        <footer className="mt-16 flex justify-end">
-            <div className="w-2/5 space-y-2 border-t-2 border-cyan-200/30 pt-4">
-                <div className="flex justify-between"><span>SUB_TOTAL</span><span>{profile.currency}{doc.subtotal?.toFixed(2)}</span></div>
-                {profile.taxEnabled && <div className="flex justify-between"><span>TAX ({profile.taxRate}%)</span><span>{profile.currency}{doc.taxTotal?.toFixed(2)}</span></div>}
-                <div className="flex justify-between text-2xl font-bold text-cyan-200 pt-4"><span>TOTAL_DUE</span><span>{profile.currency}{doc.total?.toFixed(2)}</span></div>
-            </div>
-        </footer>
-    </div>
-  );
-
-  const renderModernistTheme = () => (
-    <div className="p-[18mm] min-h-full flex flex-col font-sans bg-white text-[#1A1A1A]">
-      <header className="mb-20 flex justify-between items-start">
-        <div>
-          {viewMode === 'Draft' ? 
-              <input value={profile.companyName} readOnly className="text-3xl font-black uppercase tracking-tighter bg-transparent w-full focus:bg-gray-100 p-1" placeholder="Company Name" />
-              : <h1 className="text-3xl font-black uppercase tracking-tighter">{profile.companyName}</h1>
-          }
-          {viewMode === 'Draft' ? 
-              <input value={profile.email} readOnly className="text-xs uppercase tracking-widest text-gray-500 mt-3 bg-transparent w-full focus:bg-gray-100 p-1" placeholder="Email" />
-              : <p className="text-xs uppercase tracking-widest text-gray-500 mt-3">{profile.email}</p>
-          }
-        </div>
-        <div className="text-right flex flex-col items-end gap-8">
-          <div className="w-[80px] h-[80px] border-4 border-black flex items-center justify-center">
-            <span className="font-bold text-3xl">INV</span>
+            {viewMode === 'Draft' ? 
+              <input value={profile.email} readOnly className="text-xs text-gray-500 mt-3 tracking-widest uppercase bg-transparent w-full focus:bg-amber-50/30 p-1" placeholder="Email" />
+              : <p className="text-xs text-gray-500 mt-3 tracking-widest uppercase">{profile.email}</p>
+            }
           </div>
-          <p className="font-mono text-sm">{doc.id.slice(-6)}</p>
+          <div className="text-right ml-16">
+            <p className="text-6xl font-light text-gray-300 leading-none">Invoice</p>
+            <p className="text-xs tracking-[0.3em] uppercase text-gray-400 mt-2">No. {doc.id.slice(-6)}</p>
+          </div>
         </div>
       </header>
-      <section className="grid grid-cols-2 gap-16 mb-16 border-b-2 border-black pb-8">
+      
+      <section className="grid grid-cols-3 gap-16 mb-20 text-sm">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest mb-3">Client</p>
-          <input value={doc.client.businessName} onChange={e => updateClient('businessName', e.target.value)} disabled={viewMode === 'Final'} className="text-xl font-bold bg-transparent w-full focus:bg-gray-100 p-1" />
-          {viewMode === 'Draft' ? <input placeholder="Address" value={doc.client.address || ''} onChange={e => updateClient('address', e.target.value)} className="bg-transparent w-full focus:bg-gray-100 p-1 mt-2 text-sm" /> : <p className="text-gray-600 text-sm mt-2">{doc.client.address}</p>}
+          <p className="text-xs tracking-widest uppercase text-gray-400 mb-4">Invoiced To</p>
+          <input value={doc.client.businessName} onChange={e => updateClient('businessName', e.target.value)} disabled={viewMode === 'Final'} className="text-lg font-medium bg-transparent w-full focus:bg-amber-50/30 p-1" />
+          {viewMode === 'Draft' ? <input placeholder="Email" value={doc.client.email || ''} onChange={e => updateClient('email', e.target.value)} className="bg-transparent w-full focus:bg-amber-50/30 p-1 text-gray-600 mt-2" /> : <p className="text-gray-600 mt-2">{doc.client.email}</p>}
         </div>
-        <div className="text-right">
-          <p className="text-xs font-bold uppercase tracking-widest mb-3">Invoice Date</p>
-          <input value={doc.date} onChange={e => updateDocField('date', e.target.value)} disabled={viewMode === 'Final'} className="text-xl font-bold bg-transparent w-full text-right focus:bg-gray-100 p-1" />
-          {doc.dueDate && <p className="text-sm mt-2 font-bold">Due: {doc.dueDate}</p>}
+        <div>
+          <p className="text-xs tracking-widest uppercase text-gray-400 mb-4">Issue Date</p>
+          <input value={doc.date} onChange={e => updateDocField('date', e.target.value)} disabled={viewMode === 'Final'} className="text-lg font-medium bg-transparent w-full focus:bg-amber-50/30 p-1" />
+        </div>
+        <div>
+          {doc.dueDate && (
+            <>
+              <p className="text-xs tracking-widest uppercase text-gray-400 mb-4">Payment Due</p>
+              <p className="text-lg font-medium text-amber-700">{doc.dueDate}</p>
+            </>
+          )}
         </div>
       </section>
-      <main className="flex-1 my-8">
-        <table className="w-full text-left text-sm">
-            <thead><tr className="border-b-4 border-black">{viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}<th className="pb-4 font-black uppercase tracking-wider">Item</th><th className="pb-4 font-black uppercase tracking-wider text-right">QTY</th><th className="pb-4 font-black uppercase tracking-wider text-right">RATE</th><th className="pb-4 font-black uppercase tracking-wider text-right">TOTAL</th></tr></thead>
-            <tbody>
-                {doc.items?.map((item) => renderRowContent(item, { tr: 'border-b-2 border-gray-200' }))}
-                {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={5} className="py-6 text-center"><button onClick={onAddItem} className="font-bold text-xs border-2 border-black px-6 py-2 hover:bg-black hover:text-white transition-colors">+ ADD ITEM</button></td></tr>}
-            </tbody>
+      
+      <main className="flex-1 mb-16">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="border-b-2 border-gray-900">
+              {viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}
+              <th className="py-4 text-xs tracking-widest uppercase text-gray-500 font-normal w-20">Qty</th>
+              <th className="py-4 text-xs tracking-widest uppercase text-gray-500 font-normal w-20">Unit</th>
+              <th className="py-4 text-xs tracking-widest uppercase text-gray-500 font-normal">Service Description</th>
+              <th className="py-4 text-xs tracking-widest uppercase text-gray-500 font-normal text-right">Rate</th>
+              <th className="py-4 text-xs tracking-widest uppercase text-gray-500 font-normal text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(groupedItems).map(([blockName, items]: [string, InvoiceItem[]]) => (
+              <React.Fragment key={blockName}>
+                {blockName !== 'Items' && (
+                  <tr>
+                    <td colSpan={viewMode === 'Draft' ? 6 : 5} className="pt-12 pb-4">
+                      <div className="relative">
+                        <h3 className="text-sm tracking-[0.2em] uppercase font-medium text-gray-600">{blockName}</h3>
+                        <div className="absolute -bottom-2 left-0 w-12 h-[1px] bg-amber-600"></div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {items.map((item) => renderRowContent(item, { tr: 'border-b border-gray-100 group hover:bg-amber-50/20', td: 'py-5', input: 'text-sm' }))}
+              </React.Fragment>
+            ))}
+            {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-12 text-center"><button onClick={onAddItem} className="text-xs tracking-widest uppercase text-gray-400 hover:text-black transition-colors">+ Add Line</button></td></tr>}
+          </tbody>
         </table>
       </main>
-      <div className="mt-8 pt-4 border-t-2 border-gray-300">
-        {doc.notes && <p className="text-sm whitespace-pre-wrap text-gray-700 mb-4">{doc.notes}</p>}
-      </div>
-      <footer className="border-t-4 border-black pt-8 flex justify-between items-end">
-        <div className="flex flex-col gap-2 text-xs">
-          <p className="text-gray-500">Please remit payment by due date.</p>
-          <p className="text-gray-500">Bank details available upon request.</p>
-        </div>
-        <div className="space-y-2">
-            <div className="flex gap-12"><span className="font-bold">SUBTOTAL</span><span className="font-mono w-24 text-right">{profile.currency}{doc.subtotal?.toFixed(2)}</span></div>
-            {profile.taxEnabled && <div className="flex gap-12"><span className="font-bold">{profile.taxName}</span><span className="font-mono w-24 text-right">{profile.currency}{doc.taxTotal?.toFixed(2)}</span></div>}
-            <div className="flex gap-12 text-2xl font-black pt-2"><span>TOTAL</span><span className="font-mono w-24 text-right">{profile.currency}{doc.total?.toFixed(2)}</span></div>
-        </div>
-      </footer>
-    </div>
-  );
-
-  const renderMinimalTheme = () => (
-    <div className="p-[20mm] min-h-full flex flex-col font-ui bg-white text-gray-800">
-      <header className="flex justify-between items-start mb-24">
-        {viewMode === 'Draft' ? 
-            <input value={profile.companyName} readOnly className="text-xl font-bold tracking-widest uppercase bg-transparent w-1/2 focus:bg-gray-50 p-1" placeholder="Company Name" />
-            : <h1 className="text-xl font-bold tracking-widest uppercase">{profile.companyName}</h1>
-        }
-        <h2 className="text-xl font-bold text-gray-300">Invoice</h2>
-      </header>
-      <section className="grid grid-cols-3 gap-8 mb-16 text-sm">
-        <div>
-          <p className="text-gray-400 mb-2">To</p>
-          <input value={doc.client.businessName} onChange={e => updateClient('businessName', e.target.value)} disabled={viewMode === 'Final'} className="font-bold bg-transparent w-full focus:bg-gray-50 p-1" />
-          {viewMode === 'Draft' ? <input placeholder="Email" value={doc.client.email || ''} onChange={e => updateClient('email', e.target.value)} className="bg-transparent w-full focus:bg-gray-50 p-1 text-gray-500" /> : <p className="text-gray-500">{doc.client.email}</p>}
-        </div>
-        <div>
-          <p className="text-gray-400 mb-2">Invoice No.</p>
-          <p className="font-bold">{doc.id.slice(-6)}</p>
-        </div>
-        <div>
-          <p className="text-gray-400 mb-2">Date</p>
-          <input value={doc.date} onChange={e => updateDocField('date', e.target.value)} disabled={viewMode === 'Final'} className="font-bold bg-transparent w-full focus:bg-gray-50 p-1" />
-          {doc.dueDate && <p className="text-xs mt-1 text-red-400">Due: {doc.dueDate}</p>}
-        </div>
-      </section>
-      <main className="flex-1">
-        <table className="w-full text-left text-sm">
-            <thead><tr>{viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}<th className="py-3 border-b border-gray-200 text-gray-400 font-medium">Description</th><th className="py-3 border-b border-gray-200 text-gray-400 font-medium text-right">Qty</th><th className="py-3 border-b border-gray-200 text-gray-400 font-medium text-right">Rate</th><th className="py-3 border-b border-gray-200 text-gray-400 font-medium text-right">Amount</th></tr></thead>
-            <tbody>
-                {doc.items?.map((item) => renderRowContent(item, { tr: 'border-b border-gray-100', input: 'text-sm' }))}
-                {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={5} className="py-6 text-center"><button onClick={onAddItem} className="text-gray-400 text-xs font-bold hover:text-black transition-colors">+ Add Item</button></td></tr>}
-            </tbody>
-        </table>
-      </main>
+      
       {doc.notes && (
-        <div className="mt-8 pt-4 border-t border-gray-200">
-          <p className="text-xs whitespace-pre-wrap text-gray-500">{doc.notes}</p>
+        <div className="mb-12 p-6 bg-gray-50 border-l-2 border-gray-300">
+          <p className="text-xs tracking-widest uppercase text-gray-400 mb-3">Notes</p>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-700">{doc.notes}</p>
         </div>
       )}
-      <footer className="mt-16 flex justify-end">
-        <div className="w-1/3 space-y-2 text-sm">
-            <div className="flex justify-between text-gray-500"><span>Subtotal</span><span>{profile.currency}{doc.subtotal?.toFixed(2)}</span></div>
-            {profile.taxEnabled && <div className="flex justify-between text-gray-500"><span>{profile.taxName} ({profile.taxRate}%)</span><span>{profile.currency}{doc.taxTotal?.toFixed(2)}</span></div>}
-            <div className="flex justify-between text-xl font-bold pt-4"><span>Total</span><span>{profile.currency}{doc.total?.toFixed(2)}</span></div>
+      
+      <footer className="border-t-2 border-gray-900 pt-8 flex justify-end">
+        <div className="w-2/5 space-y-4 text-sm">
+          <div className="flex justify-between text-gray-600"><span className="tracking-wider">Subtotal</span><span className="font-mono">{profile.currency}{doc.subtotal?.toFixed(2)}</span></div>
+          {profile.taxEnabled && <div className="flex justify-between text-gray-600"><span className="tracking-wider">{profile.taxName} ({profile.taxRate}%)</span><span className="font-mono">{profile.currency}{doc.taxTotal?.toFixed(2)}</span></div>}
+          <div className="flex justify-between text-2xl font-light pt-6 border-t border-gray-300"><span>Total</span><span className="font-mono">{profile.currency}{doc.total?.toFixed(2)}</span></div>
+          <p className="text-xs text-gray-400 tracking-wider pt-4">Payment terms: Net 30 days</p>
         </div>
       </footer>
+    </div>
+  );
+
+  // CREATIVE STUDIO THEME - Bold, confident design inspired by Pentagram, Studio Feixen, design agencies
+  const renderModernistTheme = () => (
+    <div className="min-h-full flex flex-col font-sans bg-gradient-to-br from-gray-50 to-white text-gray-900">
+      {/* Diagonal color accent inspired by creative studios */}
+      <div className="absolute top-0 left-0 w-full h-[120px] bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-500 -skew-y-2 origin-top-left"></div>
+      
+      <div className="relative z-10 p-[20mm] pt-[35mm] flex flex-col flex-1">
+        <header className="mb-20">
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              {viewMode === 'Draft' ? 
+                <input value={profile.companyName} readOnly className="text-5xl font-black tracking-tight bg-transparent w-full focus:bg-yellow-50 p-1 leading-none" placeholder="Company Name" />
+                : <h1 className="text-5xl font-black tracking-tight leading-none">{profile.companyName}</h1>
+              }
+              {viewMode === 'Draft' ? 
+                <input value={profile.email} readOnly className="text-sm text-gray-600 mt-4 bg-transparent w-full focus:bg-yellow-50 p-1" placeholder="Email" />
+                : <p className="text-sm text-gray-600 mt-4">{profile.email}</p>
+              }
+            </div>
+            <div className="ml-12">
+              <div className="text-right bg-black text-white px-6 py-4 -rotate-2">
+                <p className="text-xs tracking-[0.3em] uppercase mb-1">Invoice</p>
+                <p className="font-mono font-bold text-xl">{doc.id.slice(-6)}</p>
+              </div>
+            </div>
+          </div>
+        </header>
+        
+        <section className="grid grid-cols-2 gap-20 mb-16">
+          <div>
+            <div className="inline-block bg-fuchsia-600 text-white px-3 py-1 text-xs tracking-widest uppercase mb-4">Client</div>
+            <input value={doc.client.businessName} onChange={e => updateClient('businessName', e.target.value)} disabled={viewMode === 'Final'} className="text-2xl font-bold bg-transparent w-full focus:bg-yellow-50 p-1 block" />
+            {viewMode === 'Draft' ? <input placeholder="Email" value={doc.client.email || ''} onChange={e => updateClient('email', e.target.value)} className="bg-transparent w-full focus:bg-yellow-50 p-1 text-gray-600 mt-2" /> : <p className="text-gray-600 mt-2">{doc.client.email}</p>}
+          </div>
+          <div className="text-right">
+            <div className="inline-block bg-violet-600 text-white px-3 py-1 text-xs tracking-widest uppercase mb-4">Date</div>
+            <input value={doc.date} onChange={e => updateDocField('date', e.target.value)} disabled={viewMode === 'Final'} className="text-2xl font-bold bg-transparent w-full text-right focus:bg-yellow-50 p-1 block" />
+            {doc.dueDate && <p className="text-sm mt-2 font-bold text-fuchsia-600">Due: {doc.dueDate}</p>}
+          </div>
+        </section>
+        
+        <main className="flex-1 mb-12">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b-4 border-black">
+                {viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}
+                <th className="pb-4 font-black uppercase tracking-wider text-xs w-16">Qty</th>
+                <th className="pb-4 font-black uppercase tracking-wider text-xs w-16">Unit</th>
+                <th className="pb-4 font-black uppercase tracking-wider text-xs">Description</th>
+                <th className="pb-4 font-black uppercase tracking-wider text-xs text-right">Rate</th>
+                <th className="pb-4 font-black uppercase tracking-wider text-xs text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(groupedItems).map(([blockName, items]: [string, InvoiceItem[]]) => (
+                <React.Fragment key={blockName}>
+                  {blockName !== 'Items' && (
+                    <tr>
+                      <td colSpan={viewMode === 'Draft' ? 6 : 5} className="pt-10 pb-3">
+                        <div className="inline-block bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white px-4 py-2">
+                          <h3 className="text-xs tracking-[0.2em] uppercase font-black">{blockName}</h3>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  {items.map((item) => renderRowContent(item, { tr: 'border-b border-gray-200 hover:bg-violet-50/30', td: 'py-4' }))}
+                </React.Fragment>
+              ))}
+              {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-8 text-center"><button onClick={onAddItem} className="font-black text-xs border-2 border-black px-8 py-3 hover:bg-black hover:text-white transition-all hover:scale-105">+ ADD LINE</button></td></tr>}
+            </tbody>
+          </table>
+        </main>
+        
+        {doc.notes && (
+          <div className="mb-12 p-6 bg-gradient-to-r from-violet-50 to-fuchsia-50 border-l-4 border-fuchsia-600">
+            <p className="text-xs uppercase tracking-widest font-black mb-2 text-gray-700">Notes</p>
+            <p className="text-sm whitespace-pre-wrap text-gray-700">{doc.notes}</p>
+          </div>
+        )}
+        
+        <footer className="border-t-4 border-black pt-8">
+          <div className="flex justify-end">
+            <div className="w-2/5 space-y-3">
+              <div className="flex justify-between text-sm font-bold"><span>Subtotal</span><span className="font-mono">{profile.currency}{doc.subtotal?.toFixed(2)}</span></div>
+              {profile.taxEnabled && <div className="flex justify-between text-sm font-bold"><span>{profile.taxName} ({profile.taxRate}%)</span><span className="font-mono">{profile.currency}{doc.taxTotal?.toFixed(2)}</span></div>}
+              <div className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white p-6 mt-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-black tracking-wider">TOTAL DUE</span>
+                  <span className="text-4xl font-black font-mono">{profile.currency}{doc.total?.toFixed(2)}</span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 text-center pt-4 tracking-wider">Thank you for your business</p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+  );
+
+  // LUXURY MINIMAL THEME - Inspired by luxury brand invoices (Hermès, Apple) - restraint, precision, quality
+  const renderMinimalTheme = () => (
+    <div className="p-[25mm] min-h-full flex flex-col font-sans bg-white text-black">
+      {/* Subtle gold accent line - luxury detail */}
+      <div className="absolute top-0 left-[25mm] right-[25mm] h-[0.5mm] bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
+      
+      <header className="flex justify-between items-start mb-32 pt-8">
+        <div className="flex-1">
+          {viewMode === 'Draft' ? 
+            <input value={profile.companyName} readOnly className="text-xl font-medium tracking-[0.05em] bg-transparent w-full focus:bg-gray-50 p-1" placeholder="Company Name" />
+            : <h1 className="text-xl font-medium tracking-[0.05em]">{profile.companyName}</h1>
+          }
+          {viewMode === 'Draft' ? 
+            <input value={profile.email} readOnly className="text-xs text-gray-500 mt-3 bg-transparent w-full focus:bg-gray-50 p-1" placeholder="Email" />
+            : <p className="text-xs text-gray-500 mt-3">{profile.email}</p>
+          }
+        </div>
+        <div className="text-right ml-16">
+          <p className="text-xs tracking-[0.2em] uppercase text-gray-400 mb-2">Invoice</p>
+          <p className="font-mono text-sm text-gray-900">{doc.id.slice(-6)}</p>
+        </div>
+      </header>
+      
+      <section className="grid grid-cols-3 gap-16 mb-24 text-sm">
+        <div>
+          <p className="text-xs text-gray-400 mb-3 tracking-wider">Billed To</p>
+          <input value={doc.client.businessName} onChange={e => updateClient('businessName', e.target.value)} disabled={viewMode === 'Final'} className="font-medium text-base bg-transparent w-full focus:bg-gray-50 p-1" />
+          {viewMode === 'Draft' ? <input placeholder="Email" value={doc.client.email || ''} onChange={e => updateClient('email', e.target.value)} className="bg-transparent w-full focus:bg-gray-50 p-1 text-gray-600 mt-2 text-sm" /> : <p className="text-gray-600 mt-2">{doc.client.email}</p>}
+        </div>
+        <div>
+          <p className="text-xs text-gray-400 mb-3 tracking-wider">Invoice Date</p>
+          <input value={doc.date} onChange={e => updateDocField('date', e.target.value)} disabled={viewMode === 'Final'} className="font-medium text-base bg-transparent w-full focus:bg-gray-50 p-1" />
+        </div>
+        <div>
+          {doc.dueDate && (
+            <>
+              <p className="text-xs text-gray-400 mb-3 tracking-wider">Payment Due</p>
+              <p className="font-medium text-base">{doc.dueDate}</p>
+            </>
+          )}
+        </div>
+      </section>
+      
+      <main className="flex-1">
+        <table className="w-full text-left text-sm">
+          <thead>
+            <tr className="border-b border-gray-200">
+              {viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}
+              <th className="py-4 text-xs text-gray-400 font-normal tracking-wider w-16">Qty</th>
+              <th className="py-4 text-xs text-gray-400 font-normal tracking-wider w-16">Unit</th>
+              <th className="py-4 text-xs text-gray-400 font-normal tracking-wider">Description</th>
+              <th className="py-4 text-xs text-gray-400 font-normal tracking-wider text-right">Rate</th>
+              <th className="py-4 text-xs text-gray-400 font-normal tracking-wider text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(groupedItems).map(([blockName, items]: [string, InvoiceItem[]]) => (
+              <React.Fragment key={blockName}>
+                {blockName !== 'Items' && (
+                  <tr>
+                    <td colSpan={viewMode === 'Draft' ? 6 : 5} className="pt-10 pb-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-1 h-1 rounded-full bg-amber-500"></div>
+                        <h3 className="text-xs tracking-[0.15em] uppercase font-medium text-gray-700">{blockName}</h3>
+                        <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {items.map((item) => renderRowContent(item, { tr: 'border-b border-gray-50 hover:bg-gray-50/50', td: 'py-5', input: 'text-sm' }))}
+              </React.Fragment>
+            ))}
+            {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-12 text-center"><button onClick={onAddItem} className="text-xs text-gray-400 hover:text-black transition-colors tracking-wider">+ Add Line Item</button></td></tr>}
+          </tbody>
+        </table>
+      </main>
+      
+      {doc.notes && (
+        <div className="mt-16 pt-6 border-t border-gray-100">
+          <p className="text-xs text-gray-400 mb-3 tracking-wider">Additional Notes</p>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-700">{doc.notes}</p>
+        </div>
+      )}
+      
+      <footer className="mt-24 pt-8 border-t border-gray-200 flex justify-end">
+        <div className="w-2/5 space-y-3 text-sm">
+          <div className="flex justify-between text-gray-600"><span className="tracking-wider">Subtotal</span><span className="font-mono">{profile.currency}{doc.subtotal?.toFixed(2)}</span></div>
+          {profile.taxEnabled && <div className="flex justify-between text-gray-600"><span className="tracking-wider">{profile.taxName} ({profile.taxRate}%)</span><span className="font-mono">{profile.currency}{doc.taxTotal?.toFixed(2)}</span></div>}
+          <div className="flex justify-between text-xl font-medium pt-6 border-t border-gray-200"><span className="tracking-wide">Total</span><span className="font-mono">{profile.currency}{doc.total?.toFixed(2)}</span></div>
+          <p className="text-xs text-gray-400 pt-8 tracking-wider text-center">Thank you</p>
+        </div>
+      </footer>
+      
+      {/* Bottom gold accent */}
+      <div className="absolute bottom-0 left-[25mm] right-[25mm] h-[0.5mm] bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
     </div>
   );
 
