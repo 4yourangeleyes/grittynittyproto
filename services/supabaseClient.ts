@@ -31,19 +31,30 @@ const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     autoRefreshToken: true,
   },
   global: {
-    fetch: (url, options) => {
+    fetch: async (url, options) => {
       console.log('[Supabase] Fetching:', url);
       console.log('[Supabase] Fetch options:', options);
       
-      return fetch(url, options)
-        .then(response => {
-          console.log('[Supabase] Response received:', response.status, response.statusText);
-          return response;
-        })
-        .catch(error => {
-          console.error('[Supabase] Fetch error:', error);
-          throw error;
-        });
+      try {
+        const response = await fetch(url, options);
+        console.log('[Supabase] Response received:', response.status, response.statusText);
+        
+        // Clone the response so we can read it
+        const clonedResponse = response.clone();
+        
+        // Try to read the response body
+        try {
+          const text = await clonedResponse.text();
+          console.log('[Supabase] Response body (first 200 chars):', text.substring(0, 200));
+        } catch (e) {
+          console.error('[Supabase] Failed to read response body:', e);
+        }
+        
+        return response;
+      } catch (error) {
+        console.error('[Supabase] Fetch error:', error);
+        throw error;
+      }
     }
   }
 })

@@ -24,11 +24,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log('[AuthContext] Fetching profile for user:', userId);
       
+      // Create timeout promise
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Profile query timeout after 10 seconds')), 10000);
+      });
+      
       // Query without .single() to avoid 406 error
-      const { data: profileArray, error } = await supabaseClient
+      const queryPromise = supabaseClient
         .from('user_profiles')
         .select('*')
         .eq('id', userId);
+      
+      console.log('[AuthContext] Starting profile query with 10s timeout...');
+      
+      const { data: profileArray, error } = await Promise.race([
+        queryPromise,
+        timeoutPromise
+      ]) as any;
 
       console.log('[AuthContext] Query result - error:', error);
       console.log('[AuthContext] Query result - data array:', profileArray);

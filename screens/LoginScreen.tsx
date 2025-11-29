@@ -92,21 +92,12 @@ const LoginScreen: React.FC = () => {
       // Set flag to prevent App.tsx from auto-navigating during sign-up
       sessionStorage.setItem('signup_in_progress', 'true');
       
-      // 1. Sign up user with timeout
-      const signUpPromise = supabase.auth.signUp({
+      // 1. Sign up user - just await it without timeout
+      console.log('[LoginScreen] Calling signUp...');
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
       });
-      
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Sign up timeout after 30 seconds')), 30000);
-      });
-      
-      console.log('[LoginScreen] Calling signUp with 30s timeout...');
-      const { data: authData, error: signUpError } = await Promise.race([
-        signUpPromise,
-        timeoutPromise
-      ]) as any;
 
       console.log('[LoginScreen] Sign up response - error:', signUpError);
       console.log('[LoginScreen] Sign up response - user:', authData?.user?.id);
