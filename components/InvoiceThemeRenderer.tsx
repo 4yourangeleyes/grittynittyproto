@@ -711,10 +711,33 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
       </section>
       <main className="flex-1">
         <table className="w-full text-left text-sm">
-            <thead className="bg-gray-800 text-white">{<tr>{viewMode === 'Draft' && <th className="w-12 print:hidden p-3"></th>}<th className="p-3 uppercase tracking-wider">Description</th><th className="p-3 uppercase tracking-wider text-right">Quantity</th><th className="p-3 uppercase tracking-wider text-right">Unit Price</th><th className="p-3 uppercase tracking-wider text-right">Amount</th></tr>}</thead>
+            <thead className="bg-gray-800 text-white">
+              <tr>
+                {viewMode === 'Draft' && <th className="w-12 print:hidden p-3"></th>}
+                <th className="p-3 uppercase tracking-wider w-16 text-center">Qty</th>
+                <th className="p-3 uppercase tracking-wider w-16 text-center">Unit</th>
+                <th className="p-3 uppercase tracking-wider">Description</th>
+                <th className="p-3 uppercase tracking-wider text-right">Unit Price</th>
+                <th className="p-3 uppercase tracking-wider text-right">Amount</th>
+              </tr>
+            </thead>
             <tbody>
-                {doc.items?.map((item) => renderRowContent(item, { tr: 'bg-gray-50 border-b-4 border-white', td: 'p-3' }))}
-                {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={5} className="py-6 text-center bg-gray-50"><button onClick={onAddItem} className="text-xs font-bold uppercase border border-gray-300 px-4 py-2 hover:bg-gray-800 hover:text-white transition-colors">+ Add Item</button></td></tr>}
+                {Object.entries(groupedItems).map(([blockName, items]: [string, InvoiceItem[]]) => (
+                  <React.Fragment key={blockName}>
+                    {blockName !== 'Items' && (
+                      <tr>
+                        <td colSpan={viewMode === 'Draft' ? 6 : 5} className="pt-6 pb-3 bg-gray-800">
+                          <div className="flex items-center gap-3 px-3">
+                            <div className="w-1 h-4 bg-blue-500"></div>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-white">{blockName}</h3>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    {items.map((item) => renderRowContent(item, { tr: 'bg-gray-50 border-b-4 border-white', td: 'p-3' }))}
+                  </React.Fragment>
+                ))}
+                {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-6 text-center bg-gray-50"><button onClick={onAddItem} className="text-xs font-bold uppercase border border-gray-300 px-4 py-2 hover:bg-gray-800 hover:text-white transition-colors">+ Add Item</button></td></tr>}
             </tbody>
         </table>
       </main>
@@ -764,10 +787,32 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
       </section>
       <main className="flex-1 bg-white border-8 border-gray-900 p-8">
         <table className="w-full text-left">
-            <thead><tr className="border-b-4 border-gray-900">{viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}<th className="pb-4 font-black uppercase tracking-wider text-sm">Description</th><th className="pb-4 font-black uppercase tracking-wider text-sm text-right">QTY</th><th className="pb-4 font-black uppercase tracking-wider text-sm text-right">RATE</th><th className="pb-4 font-black uppercase tracking-wider text-sm text-right">AMOUNT</th></tr></thead>
+            <thead>
+              <tr className="border-b-4 border-gray-900">
+                {viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}
+                <th className="pb-4 font-black uppercase tracking-wider text-xs w-16 text-center">QTY</th>
+                <th className="pb-4 font-black uppercase tracking-wider text-xs w-16 text-center">UNIT</th>
+                <th className="pb-4 font-black uppercase tracking-wider text-xs">Description</th>
+                <th className="pb-4 font-black uppercase tracking-wider text-xs text-right">RATE</th>
+                <th className="pb-4 font-black uppercase tracking-wider text-xs text-right">AMOUNT</th>
+              </tr>
+            </thead>
             <tbody>
-                {doc.items?.map((item) => renderRowContent(item, { tr: 'border-b-4 border-gray-200' }))}
-                {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={5} className="py-6 text-center"><button onClick={onAddItem} className="font-black text-xs border-4 border-gray-900 px-6 py-3 hover:bg-gray-900 hover:text-white transition-colors">+ ADD</button></td></tr>}
+                {Object.entries(groupedItems).map(([blockName, items]: [string, InvoiceItem[]]) => (
+                  <React.Fragment key={blockName}>
+                    {blockName !== 'Items' && (
+                      <tr>
+                        <td colSpan={viewMode === 'Draft' ? 6 : 5} className="pt-8 pb-4">
+                          <div className="bg-gray-900 text-white px-4 py-3 -mx-8 border-l-8 border-yellow-400">
+                            <h3 className="text-sm font-black uppercase tracking-[0.2em]">{blockName}</h3>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    {items.map((item) => renderRowContent(item, { tr: 'border-b-4 border-gray-200' }))}
+                  </React.Fragment>
+                ))}
+                {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-6 text-center"><button onClick={onAddItem} className="font-black text-xs border-4 border-gray-900 px-6 py-3 hover:bg-gray-900 hover:text-white transition-colors">+ ADD</button></td></tr>}
             </tbody>
         </table>
       </main>
@@ -818,10 +863,34 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
           </section>
           <main className="flex-1 relative">
             <table className="w-full text-left">
-              <thead><tr className="border-b-4 border-indigo-600">{viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}<th className="py-4 font-black uppercase text-xs tracking-widest">Description</th><th className="py-4 font-black uppercase text-xs tracking-widest text-right">Qty</th><th className="py-4 font-black uppercase text-xs tracking-widest text-right">Rate</th><th className="py-4 font-black uppercase text-xs tracking-widest text-right">Amount</th></tr></thead>
+              <thead>
+                <tr className="border-b-4 border-indigo-600">
+                  {viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}
+                  <th className="py-4 font-black uppercase text-xs tracking-widest w-16 text-center">Qty</th>
+                  <th className="py-4 font-black uppercase text-xs tracking-widest w-16 text-center">Unit</th>
+                  <th className="py-4 font-black uppercase text-xs tracking-widest">Description</th>
+                  <th className="py-4 font-black uppercase text-xs tracking-widest text-right">Rate</th>
+                  <th className="py-4 font-black uppercase text-xs tracking-widest text-right">Amount</th>
+                </tr>
+              </thead>
               <tbody>
-                  {doc.items?.map((item) => renderRowContent(item, { tr: 'border-b-2 border-gray-200' }))}
-                  {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={5} className="py-6 text-center"><button onClick={onAddItem} className="text-xs font-bold uppercase border-2 border-indigo-600 px-6 py-2 hover:bg-indigo-600 hover:text-white transition-colors">+ Add Item</button></td></tr>}
+                  {Object.entries(groupedItems).map(([blockName, items]: [string, InvoiceItem[]]) => (
+                    <React.Fragment key={blockName}>
+                      {blockName !== 'Items' && (
+                        <tr>
+                          <td colSpan={viewMode === 'Draft' ? 6 : 5} className="pt-10 pb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-1 bg-gradient-to-r from-indigo-600 to-blue-700"></div>
+                              <h3 className="text-sm font-black uppercase tracking-[0.2em] text-indigo-600">{blockName}</h3>
+                              <div className="flex-1 h-px bg-gradient-to-r from-indigo-200 to-transparent"></div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                      {items.map((item) => renderRowContent(item, { tr: 'border-b-2 border-gray-200' }))}
+                    </React.Fragment>
+                  ))}
+                  {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-6 text-center"><button onClick={onAddItem} className="text-xs font-bold uppercase border-2 border-indigo-600 px-6 py-2 hover:bg-indigo-600 hover:text-white transition-colors">+ Add Item</button></td></tr>}
               </tbody>
             </table>
           </main>
