@@ -8,6 +8,7 @@ import { triggerHaptic } from '../App';
 import { generateInvoicePDF, generateInvoicePDFBase64, extractInvoiceHTML } from '../services/pdfService';
 import { sendInvoiceEmail, isValidEmail } from '../services/emailService';
 import { InvoiceThemeRenderer } from '../components/InvoiceThemeRenderer';
+import { Client } from '../types';
 
 interface CanvasScreenProps {
   doc: DocumentData | null;
@@ -18,6 +19,8 @@ interface CanvasScreenProps {
   onSave: (doc: DocumentData) => void;
   itemUsage: Record<string, number>;
   onTrackItemUsage: (desc: string) => void;
+  clients: Client[];
+  setClients: React.Dispatch<React.SetStateAction<Client[]>>;
 }
 
 const UNIT_TYPES = ['ea', 'hrs', 'days', 'm', 'ft', 'sqm', 'set', 'pts'];
@@ -35,7 +38,7 @@ const INVOICE_THEMES: { id: InvoiceTheme; name: string; description: string; el:
 ];
 
 
-const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, templates, setTemplates, onSave, itemUsage, onTrackItemUsage }) => {
+const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, templates, setTemplates, onSave, itemUsage, onTrackItemUsage, clients, setClients }) => {
   const navigate = useNavigate();
   const invoiceRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(0.5); 

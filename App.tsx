@@ -94,9 +94,11 @@ const Layout: React.FC<{ children: React.ReactNode; onSignOut: () => void }> = (
         gritDocs
       </h1>
 
-      <button onClick={() => navigate('/chat')} className="p-2 bg-grit-primary border-2 border-grit-dark shadow-grit-sm hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all">
-        <Plus size={24} className="text-grit-dark" />
-      </button>
+      <div className="flex gap-2">
+        <button onClick={() => navigate('/canvas')} className="p-2 bg-grit-primary border-2 border-grit-dark shadow-grit-sm hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all" title="Create New Document">
+          <Plus size={24} className="text-grit-dark" />
+        </button>
+      </div>
     </div>
   );
 
@@ -111,6 +113,8 @@ const Layout: React.FC<{ children: React.ReactNode; onSignOut: () => void }> = (
         
         <nav className="flex flex-col gap-4">
           <button onClick={() => { navigate('/'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Dashboard</button>
+          <button onClick={() => { navigate('/chat'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">AI Chat</button>
+          <button onClick={() => { navigate('/canvas'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Create Document</button>
           <button onClick={() => { navigate('/documents'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Documents</button>
           <button onClick={() => { navigate('/clients'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Clients</button>
           <button onClick={() => { navigate('/settings'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Settings & Profile</button>
@@ -367,6 +371,8 @@ const AppRoutes: React.FC<any> = (props) => {
                        onSave={handleSaveDocument} 
                        itemUsage={props.itemUsage}
                        onTrackItemUsage={props.trackItemUsage}
+                       clients={clients}
+                       setClients={setClients}
                     /> 
             } />
 
