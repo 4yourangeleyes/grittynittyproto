@@ -13,7 +13,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 // Lazy Load Screens for Performance
 const LoginScreen = lazy(() => import('./screens/LoginScreen'));
 const DashboardScreen = lazy(() => import('./screens/DashboardScreen'));
-const ChatScreen = lazy(() => import('./screens/ChatScreen'));
+const ChatScreen = lazy(() => import('./screens/ChatScreenConversational'));
 const CanvasScreen = lazy(() => import('./screens/CanvasScreen'));
 const SettingsScreen = lazy(() => import('./screens/SettingsScreen'));
 const ClientsScreen = lazy(() => import('./screens/ClientsScreen'));

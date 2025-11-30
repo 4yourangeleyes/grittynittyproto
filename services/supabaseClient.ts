@@ -125,7 +125,10 @@ export const generateDocumentViaEdgeFunction = async (
   prompt: string,
   docType: 'INVOICE' | 'CONTRACT' | 'HRDOC',
   clientName: string,
-  businessName: string
+  businessName: string,
+  industry?: string,
+  conversationHistory?: Array<{role: string, content: string}>,
+  templateContext?: string
 ) => {
   const { data, error } = await supabase.functions.invoke('generate-document', {
     body: {
@@ -133,6 +136,9 @@ export const generateDocumentViaEdgeFunction = async (
       docType,
       clientName,
       businessName,
+      industry,
+      conversationHistory,
+      templateContext,
     },
   })
 

@@ -148,13 +148,17 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
             {viewMode === 'Draft' ? (
               <div className="space-y-1">
                 <input value={profile.email} readOnly className="text-sm bg-transparent w-full focus:bg-yellow-50 p-1" placeholder="Email" />
-                <input value={profile.registrationNumber || ''} readOnly className="text-sm bg-transparent w-full focus:bg-yellow-50 p-1" placeholder="Registration Number" />
+                {profile.phone && <input value={profile.phone} readOnly className="text-sm bg-transparent w-full focus:bg-yellow-50 p-1" placeholder="Phone" />}
+                {profile.address && <input value={profile.address} readOnly className="text-sm bg-transparent w-full focus:bg-yellow-50 p-1" placeholder="Address" />}
+                {profile.registrationNumber && <input value={profile.registrationNumber} readOnly className="text-sm bg-transparent w-full focus:bg-yellow-50 p-1" placeholder="Registration Number" />}
                 {profile.vatRegistrationNumber && <p className="text-sm text-gray-700">VAT: {profile.vatRegistrationNumber}</p>}
               </div>
             ) : (
               <>
                 <p>{profile.email}</p>
-                <p>{profile.registrationNumber}</p>
+                {profile.phone && <p>{profile.phone}</p>}
+                {profile.address && <p>{profile.address}</p>}
+                {profile.registrationNumber && <p>{profile.registrationNumber}</p>}
                 {profile.vatRegistrationNumber && <p>VAT: {profile.vatRegistrationNumber}</p>}
               </>
             )}
@@ -169,9 +173,10 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
               {viewMode === 'Draft' ? (
                 <div className="space-y-1 mt-1">
                   <input placeholder="Email" value={doc.client.email || ''} onChange={e => updateClient('email', e.target.value)} className="text-sm bg-transparent w-full focus:bg-yellow-50 p-1" />
+                  <input placeholder="Phone" value={doc.client.phone || ''} onChange={e => updateClient('phone', e.target.value)} className="text-sm bg-transparent w-full focus:bg-yellow-50 p-1" />
                   <input placeholder="Address" value={doc.client.address || ''} onChange={e => updateClient('address', e.target.value)} className="text-sm bg-transparent w-full focus:bg-yellow-50 p-1" />
                 </div>
-              ) : <><p>{doc.client.email}</p><p>{doc.client.address}</p></>}
+              ) : <>{doc.client.email && <p>{doc.client.email}</p>}{doc.client.phone && <p>{doc.client.phone}</p>}{doc.client.address && <p>{doc.client.address}</p>}</>}
             </div>
           </div>
           <div className="flex justify-between items-end border-b border-gray-200 pb-2">

@@ -7,21 +7,42 @@
  */
 
 import { generateDocumentViaEdgeFunction } from './supabaseClient';
-import { DocType } from '../types';
+import { DocType, TemplateBlock } from '../types';
 
 export const generateDocumentContent = async (
   prompt: string,
   docType: DocType,
   clientName: string,
-  businessName: string
+  businessName: string,
+  industry?: string,
+  conversationHistory?: Array<{role: string, content: string}>,
+  templates?: TemplateBlock[]
 ) => {
   try {
+    // Build template context string for AI to reference
+    let templateContext = '';
+    if (templates && templates.length > 0) {
+      templateContext = templates
+        .filter(t => t.type === docType)
+        .slice(0, 5) // Only send top 5 templates to avoid token limits
+        .map(t => {
+          const itemList = t.items?.slice(0, 10).map(i => 
+            `  - ${i.description}: R${i.price} (${i.quantity} ${i.unitType})`
+          ).join('\n') || '';
+          return `${t.name} (${t.category}):\n${itemList}`;
+        })
+        .join('\n\n');
+    }
+
     // Call the Supabase Edge Function (which securely uses GENAI_API_KEY)
     const result = await generateDocumentViaEdgeFunction(
       prompt,
       docType === DocType.INVOICE ? 'INVOICE' : docType === DocType.CONTRACT ? 'CONTRACT' : 'HRDOC',
       clientName,
-      businessName
+      businessName,
+      industry,
+      conversationHistory,
+      templateContext
     );
 
     return result;
