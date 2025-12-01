@@ -99,7 +99,7 @@ export const useClients = (initialClients: Client[] = []) => {
 
     try {
       const clientToSave = {
-        id: client.id || crypto.randomUUID(),
+        id: client.id || `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         user_id: user.id,
         business_name: client.businessName,
         registration_number: client.registrationNumber,

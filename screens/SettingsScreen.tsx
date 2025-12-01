@@ -636,6 +636,174 @@ const SettingsScreen: React.FC<SettingsProps> = ({ clients, setClients, template
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{templates.map(t => <div key={t.id} className="bg-white border-2 border-gray-200 p-4 relative group hover:border-grit-dark"><button onClick={() => setTemplates(ts => ts.filter(x => x.id !== t.id))} className="absolute top-2 right-2 text-gray-300 hover:text-red-500"><Trash2 size={16}/></button><div className="flex justify-between"><span className="text-xs font-bold bg-blue-100 px-2 py-1">{t.type}</span><span className="text-xs uppercase text-gray-400">{t.category}</span></div><h3 className="font-bold text-lg">{t.name}</h3></div>)}</div></div>
             )}
 
+            {activeTab === 'clients' && (
+                <div className="space-y-8 animate-in fade-in">
+                    <div className="flex justify-between items-center border-b-4 border-grit-secondary pb-4">
+                        <h2 className="text-3xl font-bold">Clients</h2>
+                        <Button size="sm" onClick={() => setIsAddingClient(true)} icon={<Plus size={18}/>}>Add Client</Button>
+                    </div>
+                    
+                    {isAddingClient && (
+                        <div className="bg-gray-100 p-6 border-2 border-grit-dark mb-6">
+                            <h3 className="font-bold text-xl mb-4">{editingClientId ? 'Edit Client' : 'Add New Client'}</h3>
+                            <div className="grid gap-4">
+                                <Input 
+                                    label="Client Name" 
+                                    value={newClientName} 
+                                    onChange={e => setNewClientName(e.target.value)} 
+                                    placeholder="Company Name or Individual"
+                                />
+                                <Input 
+                                    label="Registration Number" 
+                                    value={newClientReg} 
+                                    onChange={e => setNewClientReg(e.target.value)} 
+                                    placeholder="Optional"
+                                />
+                                <Input 
+                                    label="Email" 
+                                    type="email"
+                                    value={newClientEmail} 
+                                    onChange={e => setNewClientEmail(e.target.value)} 
+                                    placeholder="client@example.com"
+                                />
+                                <Input 
+                                    label="Phone" 
+                                    value={newClientPhone} 
+                                    onChange={e => setNewClientPhone(e.target.value)} 
+                                    placeholder="+27 12 345 6789"
+                                />
+                                <TextArea 
+                                    label="Address" 
+                                    value={newClientAddress} 
+                                    onChange={e => setNewClientAddress(e.target.value)} 
+                                    placeholder="Street address, city, postal code"
+                                />
+                                <div className="flex justify-end gap-2">
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={() => {
+                                            setIsAddingClient(false);
+                                            setEditingClientId(null);
+                                            setNewClientName('');
+                                            setNewClientReg('');
+                                            setNewClientEmail('');
+                                            setNewClientPhone('');
+                                            setNewClientAddress('');
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button 
+                                        onClick={async () => {
+                                            if (!newClientName.trim()) {
+                                                alert('Client name is required');
+                                                return;
+                                            }
+                                            
+                                            const clientData: Client = {
+                                                id: editingClientId || `client_${Date.now()}`,
+                                                businessName: newClientName,
+                                                registrationNumber: newClientReg,
+                                                email: newClientEmail,
+                                                phone: newClientPhone,
+                                                address: newClientAddress,
+                                            };
+                                            
+                                            try {
+                                                await saveClient(clientData);
+                                                
+                                                // Update local state
+                                                if (editingClientId) {
+                                                    setClients(prev => prev.map(c => c.id === editingClientId ? clientData : c));
+                                                } else {
+                                                    setClients(prev => [...prev, clientData]);
+                                                }
+                                                
+                                                // Reset form
+                                                setIsAddingClient(false);
+                                                setEditingClientId(null);
+                                                setNewClientName('');
+                                                setNewClientReg('');
+                                                setNewClientEmail('');
+                                                setNewClientPhone('');
+                                                setNewClientAddress('');
+                                                
+                                                triggerHaptic('success');
+                                            } catch (error) {
+                                                console.error('Error saving client:', error);
+                                                alert('Failed to save client. Please try again.');
+                                            }
+                                        }}
+                                    >
+                                        {editingClientId ? 'Update' : 'Save'} Client
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {clients.map(client => (
+                            <div key={client.id} className="bg-white border-2 border-gray-200 p-4 relative group hover:border-grit-dark transition-all">
+                                <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button 
+                                        onClick={() => {
+                                            setEditingClientId(client.id);
+                                            setNewClientName(client.businessName);
+                                            setNewClientReg(client.registrationNumber || '');
+                                            setNewClientEmail(client.email || '');
+                                            setNewClientPhone(client.phone || '');
+                                            setNewClientAddress(client.address || '');
+                                            setIsAddingClient(true);
+                                        }}
+                                        className="text-blue-500 hover:text-blue-700 p-1"
+                                    >
+                                        <Edit2 size={16}/>
+                                    </button>
+                                    <button 
+                                        onClick={async () => {
+                                            if (confirm(`Delete client "${client.businessName}"?`)) {
+                                                try {
+                                                    await deleteClient(client.id);
+                                                    setClients(prev => prev.filter(c => c.id !== client.id));
+                                                    triggerHaptic('success');
+                                                } catch (error) {
+                                                    console.error('Error deleting client:', error);
+                                                    alert('Failed to delete client.');
+                                                }
+                                            }
+                                        }}
+                                        className="text-red-400 hover:text-red-600 p-1"
+                                    >
+                                        <Trash2 size={16}/>
+                                    </button>
+                                </div>
+                                <h3 className="font-bold text-lg mb-2">{client.businessName}</h3>
+                                {client.registrationNumber && (
+                                    <p className="text-xs text-gray-500 mb-1">Reg: {client.registrationNumber}</p>
+                                )}
+                                {client.email && (
+                                    <p className="text-sm text-gray-700 mb-1">{client.email}</p>
+                                )}
+                                {client.phone && (
+                                    <p className="text-sm text-gray-700 mb-1">{client.phone}</p>
+                                )}
+                                {client.address && (
+                                    <p className="text-xs text-gray-500 mt-2">{client.address}</p>
+                                )}
+                            </div>
+                        ))}
+                        {clients.length === 0 && !isAddingClient && (
+                            <div className="col-span-2 text-center py-12 text-gray-400">
+                                <Users size={48} className="mx-auto mb-2 opacity-50"/>
+                                <p className="font-bold">No clients yet</p>
+                                <p className="text-sm">Click "Add Client" to get started</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {activeTab === 'diagnostics' && (
                 <div className="space-y-8 animate-in fade-in">
                     <h2 className="text-3xl font-bold border-b-4 border-grit-secondary pb-4 inline-block">System Diagnostics</h2>

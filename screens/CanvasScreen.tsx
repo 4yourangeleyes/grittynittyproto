@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { DocumentData, UserProfile, DocType, TemplateBlock, InvoiceItem, DocStatus, InvoiceTheme } from '../types';
-import { Plus, Minus, Save, Share2, X, Grid, Trash2, Box, CheckSquare, Square, DollarSign, GripVertical, Palette, Zap, Aperture, Layout, Feather, Building, Leaf, PenTool, Wind, Download, Mail } from 'lucide-react';
+import { DocumentData, UserProfile, DocType, TemplateBlock, InvoiceItem, DocStatus, InvoiceTheme, ContractTheme, ContractClause } from '../types';
+import { Plus, Minus, Save, Share2, X, Grid, Trash2, Box, CheckSquare, Square, DollarSign, GripVertical, Palette, Zap, Aperture, Layout, Feather, Building, Leaf, PenTool, Wind, Download, Mail, Edit3, Eye, Check, Loader, Send } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Input, TextArea } from '../components/Input';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { triggerHaptic } from '../App';
 import { generateInvoicePDF, generateInvoicePDFBase64, extractInvoiceHTML } from '../services/pdfService';
 import { sendInvoiceEmail, isValidEmail } from '../services/emailService';
 import { InvoiceThemeRenderer } from '../components/InvoiceThemeRenderer';
+import { ContractThemeRenderer } from '../components/ContractThemeRenderer';
 import { Client } from '../types';
 
 interface CanvasScreenProps {
@@ -35,6 +36,19 @@ const INVOICE_THEMES: { id: InvoiceTheme; name: string; description: string; el:
     { id: 'corporate', name: 'Corporate', description: 'Authority & Trust', el: <div className="border border-gray-400 p-1 h-full"><div className="w-full h-2 bg-blue-900"></div></div> },
     { id: 'brutalist', name: 'Brutalist', description: 'Raw & Honest', el: <div className="border-2 border-black p-1 h-full bg-gray-100 flex items-end"><div className="w-full h-1/2 bg-black"></div></div> },
     { id: 'asymmetric', name: 'Asymmetric', description: 'Dynamic & Modern', el: <div className="border border-gray-400 p-1 flex gap-1 h-full"><div className="w-1 h-full bg-gradient-to-b from-cyan-500 to-blue-600"></div><div className="flex-1 h-2 bg-gray-300 mt-auto"></div></div> },
+    { id: 'bauhaus', name: 'Bauhaus', description: 'Primary Colors & Grid', el: <div className="border border-black p-1 h-full bg-white grid grid-cols-3 gap-0.5"><div className="bg-red-600"></div><div className="bg-blue-600"></div><div className="bg-yellow-400"></div><div className="col-span-2 bg-black"></div><div className="bg-white border border-black"></div></div> },
+    { id: 'constructivist', name: 'Constructivist', description: 'Diagonal & Bold', el: <div className="border-2 border-black p-1 h-full bg-white relative overflow-hidden"><div className="absolute -rotate-45 w-full h-0.5 bg-red-600 top-1/2"></div><div className="absolute rotate-45 w-full h-0.5 bg-black top-1/2"></div><div className="absolute top-0 right-0 w-2 h-2 bg-yellow-400"></div></div> },
+    { id: 'international', name: 'International', description: 'Swiss Typographic', el: <div className="border border-gray-400 p-1 h-full bg-white"><div className="grid grid-cols-12 gap-px h-full"><div className="col-span-3 bg-black"></div><div className="col-span-9 grid grid-rows-3 gap-px"><div className="bg-gray-800"></div><div className="bg-gray-400"></div><div className="bg-gray-200"></div></div></div></div> },
+];
+
+const CONTRACT_THEMES: { id: ContractTheme; name: string; description: string; el: React.ReactNode }[] = [
+    { id: 'legal', name: 'Legal', description: 'Professional & Formal', el: <div className="border-2 border-gray-800 p-1 h-full bg-white"><div className="text-[4px] font-serif leading-tight">§1. Whereas...<br/>§2. Therefore...</div></div> },
+    { id: 'modern', name: 'Modern', description: 'Clean & Contemporary', el: <div className="border border-gray-400 p-1 h-full"><div className="w-full h-1 bg-blue-600 mb-1"></div><div className="space-y-0.5"><div className="w-3/4 h-0.5 bg-gray-300"></div><div className="w-full h-0.5 bg-gray-200"></div></div></div> },
+    { id: 'executive', name: 'Executive', description: 'Premium & Authoritative', el: <div className="border-2 border-gray-900 p-1 h-full bg-gradient-to-b from-gray-50 to-white"><div className="w-full h-1 bg-gray-900"></div></div> },
+    { id: 'minimal', name: 'Minimal', description: 'Simple & Clear', el: <div className="border border-gray-300 p-1 h-full flex flex-col gap-1"><div className="w-1/2 h-0.5 bg-gray-800"></div><div className="w-full h-0.5 bg-gray-300"></div><div className="w-3/4 h-0.5 bg-gray-300"></div></div> },
+    { id: 'bauhaus', name: 'Bauhaus', description: 'Primary Colors & Grid', el: <div className="border border-black p-1 h-full bg-white grid grid-cols-3 gap-0.5"><div className="bg-red-600"></div><div className="bg-blue-600"></div><div className="bg-yellow-400"></div><div className="col-span-2 bg-black"></div><div className="bg-white border border-black"></div></div> },
+    { id: 'constructivist', name: 'Constructivist', description: 'Diagonal & Bold', el: <div className="border-2 border-black p-1 h-full bg-white relative overflow-hidden"><div className="absolute -rotate-45 w-full h-0.5 bg-red-600 top-1/2"></div><div className="absolute rotate-45 w-full h-0.5 bg-black top-1/2"></div><div className="absolute top-0 right-0 w-2 h-2 bg-yellow-400"></div></div> },
+    { id: 'international', name: 'International', description: 'Swiss Typographic', el: <div className="border border-gray-400 p-1 h-full bg-white"><div className="grid grid-cols-12 gap-px h-full"><div className="col-span-3 bg-black"></div><div className="col-span-9 grid grid-rows-3 gap-px"><div className="bg-gray-800"></div><div className="bg-gray-400"></div><div className="bg-gray-200"></div></div></div></div> },
 ];
 
 
@@ -158,7 +172,28 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
   };
 
   const updateClient = (field: keyof typeof doc.client, value: string) => {
-      updateDoc({ ...doc, client: { ...doc.client, [field]: value } });
+      const updatedClient = { ...doc.client, [field]: value };
+      updateDoc({ ...doc, client: updatedClient });
+      
+      // Auto-save client to clients list in development
+      if (updatedClient.businessName && updatedClient.email) {
+        const existingClientIndex = clients.findIndex(c => c.id === updatedClient.id);
+        const clientData: Client = {
+          id: updatedClient.id,
+          businessName: updatedClient.businessName,
+          email: updatedClient.email,
+          phone: updatedClient.phone || '',
+          address: updatedClient.address || ''
+        };
+        
+        if (existingClientIndex >= 0) {
+          const newClients = [...clients];
+          newClients[existingClientIndex] = clientData;
+          setClients(newClients);
+        } else {
+          setClients([...clients, clientData]);
+        }
+      }
   };
 
   // PDF Export Handler
@@ -207,16 +242,32 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
 
   const handleAddTemplate = (template: TemplateBlock) => {
       if (template.type === DocType.INVOICE && template.items) {
+          // Add invoice items
           const newItems = [...(doc.items || [])];
           template.items.forEach((tItem, index) => {
               newItems.push({ 
                   ...tItem, 
                   id: `${Date.now()}-${index}`,
-                  templateBlockName: template.name // Add template block name!
+                  templateBlockName: template.name
               });
           });
           const totals = calculateTotals(newItems);
           updateDoc({ ...doc, items: newItems, ...totals });
+      } else if (template.type === DocType.CONTRACT && template.clauses) {
+          // Add contract clauses
+          const existingClauses = doc.clauses || [];
+          const newClauses = [...existingClauses];
+          const timestamp = Date.now();
+          
+          template.clauses.forEach((clause, index) => {
+              newClauses.push({
+                  ...clause,
+                  id: `${timestamp}-${index}`,
+                  order: existingClauses.length + index + 1
+              });
+          });
+          
+          updateDoc({ ...doc, clauses: newClauses });
       }
       setShowAddMenu(false); triggerHaptic('success');
   };
@@ -306,7 +357,7 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
         updateDoc(updated);
         onSave(updated);
         
-        alert(`✅ Invoice sent to ${doc.client.email}!`);
+        alert(`Invoice sent successfully to ${doc.client.email}!`);
         setShowSendEmailModal(false);
         setEmailMessage('');
         setSelectedContractId(null);
@@ -335,16 +386,16 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
           <div className="flex border-2 border-grit-dark rounded-lg overflow-hidden bg-white">
             <button 
               onClick={() => setViewMode('Draft')} 
-              className={`px-4 py-2 font-bold transition-colors ${viewMode === 'Draft' ? 'bg-grit-dark text-white' : 'hover:bg-gray-100'}`}
+              className={`px-4 py-2 font-bold transition-colors flex items-center gap-2 ${viewMode === 'Draft' ? 'bg-grit-dark text-white' : 'hover:bg-gray-100'}`}
             >
-              ✏️ Draft (Editable)
+              <Edit3 size={16} /> Draft
             </button>
             <div className="w-px bg-grit-dark"></div>
             <button 
               onClick={() => setViewMode('Final')} 
-              className={`px-4 py-2 font-bold transition-colors ${viewMode === 'Final' ? 'bg-grit-dark text-white' : 'hover:bg-gray-100'}`}
+              className={`px-4 py-2 font-bold transition-colors flex items-center gap-2 ${viewMode === 'Final' ? 'bg-grit-dark text-white' : 'hover:bg-gray-100'}`}
             >
-              👁️ Preview (Final)
+              <Eye size={16} /> Preview
             </button>
           </div>
         </div>
@@ -364,18 +415,18 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
               <div className="absolute right-0 top-full mt-2 bg-white border-2 border-grit-dark shadow-grit z-20 min-w-48">
                 <button 
                   onClick={() => handleExportPDF(true)}
-                  className="w-full text-left px-4 py-2 hover:bg-grit-primary font-bold border-b border-gray-200"
+                  className="w-full text-left px-4 py-2 hover:bg-grit-primary font-bold border-b border-gray-200 flex items-center gap-2"
                 >
-                  📥 Download PDF
+                  <Download size={16} /> Download PDF
                 </button>
                 <button 
                   onClick={() => {
                     setShowSendEmailModal(true);
                     setShowPDFMenu(false);
                   }}
-                  className="w-full text-left px-4 py-2 hover:bg-grit-primary font-bold"
+                  className="w-full text-left px-4 py-2 hover:bg-grit-primary font-bold flex items-center gap-2"
                 >
-                  📧 Email as PDF
+                  <Mail size={16} /> Email as PDF
                 </button>
               </div>
             )}
@@ -383,18 +434,89 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
         </div>
       </div>
 
-      {showStyleMenu && <div className="mb-6 grid grid-cols-3 md:grid-cols-9 gap-2 print:hidden bg-gray-50 p-4 border-2 border-grit-dark">
-        {INVOICE_THEMES.map(theme => (
-          <button key={theme.id} onClick={() => { updateDocField('theme', theme.id); setShowStyleMenu(false); triggerHaptic('light'); }} className={`p-3 border-2 flex flex-col items-center gap-2 text-center transition-all ${doc.theme === theme.id ? 'border-grit-primary bg-grit-primary' : 'border-gray-300 hover:border-grit-dark'}`}>
-            <div className="w-full h-12">{theme.el}</div>
-            <p className="text-xs font-bold">{theme.name}</p>
-            <p className="text-xs text-gray-500">{theme.description}</p>
-          </button>
-        ))}
-      </div>}
+      {showStyleMenu && (
+        <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-2 print:hidden bg-gray-50 p-4 border-2 border-grit-dark">
+          {doc.type === DocType.INVOICE && INVOICE_THEMES.map(theme => (
+            <button 
+              key={theme.id} 
+              onClick={() => { 
+                updateDocField('theme', theme.id); 
+                setShowStyleMenu(false); 
+                triggerHaptic('light'); 
+              }} 
+              className={`p-3 border-2 flex flex-col items-center gap-2 text-center transition-all ${doc.theme === theme.id ? 'border-grit-primary bg-grit-primary' : 'border-gray-300 hover:border-grit-dark'}`}
+            >
+              <div className="w-full h-12">{theme.el}</div>
+              <p className="text-xs font-bold">{theme.name}</p>
+              <p className="text-xs text-gray-500">{theme.description}</p>
+            </button>
+          ))}
+          {doc.type === DocType.CONTRACT && CONTRACT_THEMES.map(theme => (
+            <button 
+              key={theme.id} 
+              onClick={() => { 
+                updateDocField('contractTheme', theme.id); 
+                setShowStyleMenu(false); 
+                triggerHaptic('light'); 
+              }} 
+              className={`p-3 border-2 flex flex-col items-center gap-2 text-center transition-all ${doc.contractTheme === theme.id ? 'border-grit-primary bg-grit-primary' : 'border-gray-300 hover:border-grit-dark'}`}
+            >
+              <div className="w-full h-12">{theme.el}</div>
+              <p className="text-xs font-bold">{theme.name}</p>
+              <p className="text-xs text-gray-500">{theme.description}</p>
+            </button>
+          ))}
+        </div>
+      )}
 
-      <div ref={invoiceRef} className="bg-white border-4 border-grit-dark print:border-0 print:shadow-none print:overflow-visible relative" style={{ minHeight: '1123px', zoom: `${zoom}`, transformOrigin: 'top center' }}>
-        <InvoiceThemeRenderer
+      <div ref={invoiceRef} className={`bg-white print:border-0 print:shadow-none print:overflow-visible relative ${viewMode === 'Final' ? 'border-0 shadow-2xl' : 'border-4 border-grit-dark'}`} style={{ minHeight: '1123px', zoom: `${zoom}`, transformOrigin: 'top center' }}>
+        {/* Preview mode styling - simulates print appearance */}
+        {viewMode === 'Final' && (
+          <style dangerouslySetInnerHTML={{ __html: `
+            .preview-mode button,
+            .preview-mode input:not([readonly]),
+            .preview-mode textarea:not([readonly]),
+            .preview-mode select,
+            .preview-mode .print\\:hidden {
+              display: none !important;
+            }
+            .preview-mode input[readonly],
+            .preview-mode textarea[readonly] {
+              border: none !important;
+              background: transparent !important;
+              padding: 0 !important;
+            }
+          ` }} />
+        )}
+        
+        <div className={viewMode === 'Final' ? 'preview-mode' : ''}>
+        {doc.type === DocType.CONTRACT ? (
+          <ContractThemeRenderer
+            doc={doc}
+            profile={profile}
+            viewMode={viewMode}
+            updateDoc={updateDoc}
+            onAddClause={() => {
+              const newClause: ContractClause = {
+                id: Date.now().toString(),
+                title: 'New Clause',
+                content: 'Enter clause content here...',
+                order: (doc.clauses?.length || 0) + 1,
+                required: false
+              };
+              updateDoc({ ...doc, clauses: [...(doc.clauses || []), newClause] });
+              triggerHaptic('light');
+            }}
+            onDeleteClause={(id: string) => {
+              if (doc.clauses) {
+                const newClauses = doc.clauses.filter(c => c.id !== id);
+                updateDoc({ ...doc, clauses: newClauses });
+                triggerHaptic('heavy');
+              }
+            }}
+          />
+        ) : (
+          <InvoiceThemeRenderer
             doc={doc}
             profile={profile}
             viewMode={viewMode}
@@ -404,10 +526,12 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
             onToggleSelection={toggleSelection}
             selectedItems={selectedItems}
             calculateTotals={calculateTotals}
-        />
+          />
+        )}
+        </div>
         
         {/* Notes & Due Date Section - Integrated into the canvas flow */}
-        {viewMode === 'Draft' && (
+        {viewMode === 'Draft' && doc.type === DocType.INVOICE && (
           <div className="p-8 border-t-4 border-dashed border-gray-200 mt-auto print:hidden bg-gray-50 m-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -461,14 +585,19 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
         </div>
       )}
 
-      {showKaChing && <div className="fixed inset-0 flex items-center justify-center pointer-events-none text-6xl font-black text-grit-primary animate-bounce">💰</div>}
+      {showKaChing && <div className="fixed inset-0 flex items-center justify-center pointer-events-none"><DollarSign size={96} className="text-grit-primary animate-bounce font-black" /></div>}
       {suggestDeposit && <div className="fixed bottom-4 right-4 bg-grit-primary border-4 border-grit-dark p-4 max-w-xs print:hidden"><p className="font-bold mb-2">High invoice amount detected</p><button onClick={addDepositTerm} className="w-full px-3 py-2 border-2 border-grit-dark bg-grit-dark text-white hover:bg-white hover:text-grit-dark transition-colors font-bold">Add 50% Deposit Term</button></div>}
 
       {showAddMenu && (
         <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center print:hidden">
           <div className="bg-white p-6 border-4 border-grit-dark max-w-2xl w-full max-h-[80vh] overflow-auto">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold">{potentialTemplate ? 'Select Items to Add' : 'Add Line Item or Template'}</h3>
+              <h3 className="text-xl font-bold">
+                {potentialTemplate 
+                  ? `Select ${doc.type === DocType.CONTRACT ? 'Clauses' : 'Items'} to Add`
+                  : `Add ${doc.type === DocType.CONTRACT ? 'Clauses' : 'Line Items'} or Template`
+                }
+              </h3>
               <button onClick={() => { setShowAddMenu(false); setPotentialTemplate(null); setSelectedTemplateItems(new Set()); }} className="text-2xl font-bold hover:text-red-500">×</button>
             </div>
             
@@ -482,7 +611,9 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
                         <button
                           onClick={() => {
                             const template = templates.find(t => t.id === potentialTemplate);
-                            if (template?.items) {
+                            if (doc.type === DocType.CONTRACT && template?.clauses) {
+                              setSelectedTemplateItems(new Set(template.clauses.map(c => c.id)));
+                            } else if (template?.items) {
                               setSelectedTemplateItems(new Set(template.items.map(i => i.id)));
                             }
                           }}
@@ -498,32 +629,85 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
                         </button>
                       </div>
                     </div>
-                    <div className="space-y-2 mb-6 max-h-64 overflow-y-auto border-2 border-gray-200 p-4">
-                      {templates.find(t => t.id === potentialTemplate)?.items?.map(item => (
-                        <label key={item.id} className="flex items-start gap-3 p-3 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={selectedTemplateItems.has(item.id)}
-                            onChange={(e) => {
-                              const newSet = new Set(selectedTemplateItems);
-                              if (e.target.checked) newSet.add(item.id);
-                              else newSet.delete(item.id);
-                              setSelectedTemplateItems(newSet);
-                            }}
-                            className="mt-1"
-                          />
-                          <div className="flex-1">
-                            <p className="font-bold text-sm">{item.description}</p>
-                            <p className="text-xs text-gray-600">{item.quantity} {item.unitType} @ {item.price}</p>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
+                    
+                    {/* FOR CONTRACTS: Show Clauses */}
+                    {doc.type === DocType.CONTRACT && (
+                      <div className="space-y-2 mb-6 max-h-96 overflow-y-auto border-2 border-gray-200 p-4">
+                        {templates.find(t => t.id === potentialTemplate)?.clauses?.map(clause => (
+                          <label key={clause.id} className="flex items-start gap-3 p-4 border-2 border-gray-300 hover:border-grit-primary hover:bg-gray-50 cursor-pointer transition-all">
+                            <input
+                              type="checkbox"
+                              checked={selectedTemplateItems.has(clause.id)}
+                              onChange={(e) => {
+                                const newSet = new Set(selectedTemplateItems);
+                                if (e.target.checked) newSet.add(clause.id);
+                                else newSet.delete(clause.id);
+                                setSelectedTemplateItems(newSet);
+                              }}
+                              className="mt-1"
+                            />
+                            <div className="flex-1">
+                              <p className="font-bold text-sm mb-1">{clause.title}</p>
+                              <p className="text-xs text-gray-600 line-clamp-2">{clause.content.substring(0, 150)}...</p>
+                              <div className="flex gap-2 mt-1">
+                                <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded">{clause.category}</span>
+                                {clause.required && <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded">Required</span>}
+                              </div>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* FOR INVOICES: Show Items */}
+                    {doc.type === DocType.INVOICE && (
+                      <div className="space-y-2 mb-6 max-h-64 overflow-y-auto border-2 border-gray-200 p-4">
+                        {templates.find(t => t.id === potentialTemplate)?.items?.map(item => (
+                          <label key={item.id} className="flex items-start gap-3 p-3 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={selectedTemplateItems.has(item.id)}
+                              onChange={(e) => {
+                                const newSet = new Set(selectedTemplateItems);
+                                if (e.target.checked) newSet.add(item.id);
+                                else newSet.delete(item.id);
+                                setSelectedTemplateItems(newSet);
+                              }}
+                              className="mt-1"
+                            />
+                            <div className="flex-1">
+                              <p className="font-bold text-sm">{item.description}</p>
+                              <p className="text-xs text-gray-600">{item.quantity} {item.unitType} @ {item.price}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                    
                     <div className="flex gap-2">
                       <button
                         onClick={() => {
                           const template = templates.find(t => t.id === potentialTemplate);
-                          if (template && template.items && doc) {
+                          
+                          if (doc.type === DocType.CONTRACT && template?.clauses) {
+                            // Add selected clauses to contract
+                            const clausesToAdd = template.clauses.filter(c => selectedTemplateItems.has(c.id));
+                            const existingClauses = doc.clauses || [];
+                            const timestamp = Date.now();
+                            
+                            const newClauses = [...existingClauses];
+                            clausesToAdd.forEach((clause, index) => {
+                              newClauses.push({
+                                ...clause,
+                                id: `${timestamp}-${index}`,
+                                order: existingClauses.length + index + 1
+                              });
+                            });
+                            
+                            updateDoc({ ...doc, clauses: newClauses });
+                            triggerHaptic('success');
+                          } else if (template?.items) {
+                            // Add selected items to invoice
                             const itemsToAdd = template.items.filter(i => selectedTemplateItems.has(i.id));
                             const newItems = [...(doc.items || [])];
                             const timestamp = Date.now();
@@ -540,6 +724,7 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
                             updateDoc({ ...doc, items: newItems, ...totals });
                             triggerHaptic('success');
                           }
+                          
                           setShowAddMenu(false);
                           setPotentialTemplate(null);
                           setSelectedTemplateItems(new Set());
@@ -547,7 +732,7 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
                         disabled={selectedTemplateItems.size === 0}
                         className="flex-1 px-4 py-2 border-2 border-grit-dark bg-grit-primary disabled:opacity-50 hover:bg-grit-dark hover:text-white transition-colors font-bold"
                       >
-                        Confirm ({selectedTemplateItems.size})
+                        Add {selectedTemplateItems.size} {doc.type === DocType.CONTRACT ? 'Clauses' : 'Items'}
                       </button>
                       <button
                         onClick={() => { setPotentialTemplate(null); setSelectedTemplateItems(new Set()); }}
@@ -561,18 +746,42 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
               </div>
             ) : (
               <div className="space-y-4">
-                <button onClick={() => handleAddItem()} className="w-full px-4 py-3 border-2 border-grit-dark bg-grit-primary hover:bg-grit-dark hover:text-white transition-colors font-bold text-left">+ Add Blank Line Item</button>
-                {Object.entries(groupedTemplates).map(([category, templateList]: [string, TemplateBlock[]]) => (
-                  <div key={category}>
-                    <p className="font-bold text-sm text-gray-500 uppercase mb-2 pl-2">{category}</p>
-                    {templateList.map(t => (
-                      <button key={t.id} onClick={() => { setPotentialTemplate(t.id); setSelectedTemplateItems(new Set(t.items?.map(i => i.id) || [])); }} className="w-full text-left px-4 py-2 border border-gray-300 hover:bg-gray-100 transition-colors mb-2">
-                        <p className="font-bold">{t.name}</p>
-                        <p className="text-xs text-gray-600">{t.items?.length || 0} items</p>
-                      </button>
-                    ))}
-                  </div>
-                ))}
+                {doc.type === DocType.INVOICE && (
+                  <button onClick={() => handleAddItem()} className="w-full px-4 py-3 border-2 border-grit-dark bg-grit-primary hover:bg-grit-dark hover:text-white transition-colors font-bold text-left">+ Add Blank Line Item</button>
+                )}
+                {Object.entries(groupedTemplates).map(([category, templateList]: [string, TemplateBlock[]]) => {
+                  // Filter templates to match current document type
+                  const matchingTemplates = templateList.filter(t => t.type === doc.type);
+                  if (matchingTemplates.length === 0) return null;
+                  
+                  return (
+                    <div key={category}>
+                      <p className="font-bold text-sm text-gray-500 uppercase mb-2 pl-2">{category}</p>
+                      {matchingTemplates.map(t => (
+                        <button 
+                          key={t.id} 
+                          onClick={() => { 
+                            setPotentialTemplate(t.id); 
+                            if (doc.type === DocType.CONTRACT && t.clauses) {
+                              setSelectedTemplateItems(new Set(t.clauses.map(c => c.id)));
+                            } else {
+                              setSelectedTemplateItems(new Set(t.items?.map(i => i.id) || []));
+                            }
+                          }} 
+                          className="w-full text-left px-4 py-2 border border-gray-300 hover:bg-gray-100 transition-colors mb-2"
+                        >
+                          <p className="font-bold">{t.name}</p>
+                          <p className="text-xs text-gray-600">
+                            {doc.type === DocType.CONTRACT 
+                              ? `${t.clauses?.length || 0} clauses`
+                              : `${t.items?.length || 0} items`
+                            }
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -584,7 +793,7 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white border-4 border-grit-dark shadow-grit max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold">📧 Send Invoice</h2>
+              <h2 className="text-2xl font-bold flex items-center gap-2"><Mail size={28} /> Send Invoice</h2>
               <button onClick={() => setShowSendEmailModal(false)} className="text-gray-400 hover:text-grit-dark"><X size={24} /></button>
             </div>
 
@@ -649,7 +858,7 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
 
               {selectedContractId && (
                 <div className="bg-blue-50 border-2 border-blue-200 p-3 rounded">
-                  <p className="text-sm text-blue-900"><strong>✓ Contract selected:</strong> {templates.find(t => t.id === selectedContractId)?.name}</p>
+                  <p className="text-sm text-blue-900 flex items-center gap-2"><Check size={16} className="text-green-600" /> <strong>Contract selected:</strong> {templates.find(t => t.id === selectedContractId)?.name}</p>
                 </div>
               )}
 
@@ -669,7 +878,11 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
                   disabled={!doc.client.email || isSendingEmail}
                   className="flex-1 px-4 py-2 border-2 border-grit-dark bg-grit-primary disabled:opacity-50 hover:bg-grit-dark hover:text-white transition-colors font-bold"
                 >
-                  {isSendingEmail ? '⏳ Sending...' : '📤 Send Invoice'}
+                  {isSendingEmail ? (
+                    <><Loader className="animate-spin" size={16} /> Sending...</>
+                  ) : (
+                    <><Send size={16} /> Send Invoice</>
+                  )}
                 </button>
               </div>
             </div>

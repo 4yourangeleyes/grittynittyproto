@@ -9,6 +9,9 @@ import supabaseClient from './services/supabaseClient';
 import { useDocuments } from './hooks/useDocuments';
 import { useClients } from './hooks/useClients';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { DocumentCreationWizard } from './components/DocumentCreationWizard';
+import { ContractType } from './types';
+import { getClausesForContractType } from './services/clauseLibrary';
 
 // Lazy Load Screens for Performance
 const LoginScreen = lazy(() => import('./screens/LoginScreen'));
@@ -62,7 +65,11 @@ export const triggerHaptic = (type: 'success' | 'light' | 'heavy') => {
   }
 };
 
-const Layout: React.FC<{ children: React.ReactNode; onSignOut: () => void }> = ({ children, onSignOut }) => {
+const Layout: React.FC<{ 
+  children: React.ReactNode; 
+  onSignOut: () => void;
+  onShowWizard: () => void;
+}> = ({ children, onSignOut, onShowWizard }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -95,7 +102,7 @@ const Layout: React.FC<{ children: React.ReactNode; onSignOut: () => void }> = (
       </h1>
 
       <div className="flex gap-2">
-        <button onClick={() => navigate('/canvas')} className="p-2 bg-grit-primary border-2 border-grit-dark shadow-grit-sm hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all" title="Create New Document">
+        <button onClick={onShowWizard} className="p-2 bg-grit-primary border-2 border-grit-dark shadow-grit-sm hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all" title="Create New Document">
           <Plus size={24} className="text-grit-dark" />
         </button>
       </div>
@@ -114,7 +121,7 @@ const Layout: React.FC<{ children: React.ReactNode; onSignOut: () => void }> = (
         <nav className="flex flex-col gap-4">
           <button onClick={() => { navigate('/'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Dashboard</button>
           <button onClick={() => { navigate('/chat'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">AI Chat</button>
-          <button onClick={() => { navigate('/canvas'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Create Document</button>
+          <button onClick={() => { setIsMenuOpen(false); onShowWizard(); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Create Document</button>
           <button onClick={() => { navigate('/documents'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Documents</button>
           <button onClick={() => { navigate('/clients'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Clients</button>
           <button onClick={() => { navigate('/settings'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Settings & Profile</button>
@@ -208,6 +215,9 @@ export default function App() {
 const AppRoutes: React.FC<any> = (props) => {
   const navigate = useNavigate();
   const { user, isAuthenticated, isLoading, profile, signOut } = useAuth();
+  
+  // Document creation wizard state
+  const [showWizard, setShowWizard] = useState(false);
   
   // CRITICAL: All hooks must be called unconditionally, in the same order every render
   const { documents, setDocuments, saveDocument, deleteDocument } = useDocuments(
@@ -321,8 +331,47 @@ const AppRoutes: React.FC<any> = (props) => {
     await signOut();
   };
 
+  const handleWizardComplete = (client: Client, docType: DocType, contractType?: ContractType) => {
+    console.log('[App] Wizard completed:', { client, docType, contractType });
+    
+    // Get appropriate clauses for contract type
+    const contractClauses = docType === DocType.CONTRACT && contractType 
+      ? getClausesForContractType(contractType)
+      : undefined;
+    
+    console.log('[App] Generated clauses:', contractClauses?.length || 0, 'clauses');
+    
+    // Create new document with selected client and type
+    const newDoc: DocumentData = {
+      id: Date.now().toString(),
+      type: docType,
+      contractType: contractType,
+      status: 'Draft',
+      title: docType === DocType.INVOICE ? 'New Invoice' : `New ${contractType || 'Contract'}`,
+      client: client,
+      date: new Date().toLocaleDateString(),
+      items: [],
+      clauses: contractClauses,
+      currency: profile?.currency || '$',
+      subtotal: 0,
+      taxTotal: 0,
+      total: 0,
+      theme: docType === DocType.INVOICE ? 'swiss' : undefined,
+      contractTheme: docType === DocType.CONTRACT ? 'legal' : undefined
+    };
+    
+    props.setCurrentDoc(newDoc);
+    setShowWizard(false);
+    navigate('/canvas');
+    triggerHaptic('success');
+  };
+
   return (
-    <Layout onSignOut={handleSignOut}>
+    <>
+      <Layout 
+        onSignOut={handleSignOut}
+        onShowWizard={() => setShowWizard(true)}
+      >
       <ErrorBoundary>
         <Suspense fallback={<PageLoader />}>
           <Routes>
@@ -383,5 +432,16 @@ const AppRoutes: React.FC<any> = (props) => {
         </Suspense>
       </ErrorBoundary>
     </Layout>
+
+    {/* Document Creation Wizard */}
+    {showWizard && (
+      <DocumentCreationWizard
+        onClose={() => setShowWizard(false)}
+        onComplete={handleWizardComplete}
+        existingClients={clients}
+        onAddClient={saveClient}
+      />
+    )}
+    </>
   );
 }

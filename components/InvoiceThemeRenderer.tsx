@@ -980,6 +980,9 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
     corporate: renderCorporateTheme,
     brutalist: renderBrutalistTheme,
     asymmetric: renderAsymmetricTheme,
+    bauhaus: renderGeometricTheme,
+    constructivist: renderBrutalistTheme,
+    international: renderSwissTheme,
   };
 
   return <>{THEME_RENDERERS[doc.theme || 'swiss']?.()}</>;

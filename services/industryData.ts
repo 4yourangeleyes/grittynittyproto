@@ -2,13 +2,15 @@ import { InvoiceItem, TemplateBlock, DocType, Client, DocumentData } from '../ty
 import { PLUMBING_TEMPLATES } from './plumbingData';
 import { MECHANIC_TEMPLATES } from './mechanicData';
 import { CATERING_TEMPLATES } from './cateringData';
+import { NORTHCELL_STUDIOS_TEMPLATES } from './webDevelopmentData';
 
 export const INDUSTRIES = [
   'Plumber',
   'Mechanic',
   'Catering',
   'Carpenter',
-  'Construction'
+  'Construction',
+  'Web Development'
 ];
 
 // Helper to generate massive item lists for 5-page invoices
@@ -96,6 +98,10 @@ export const getIndustryTemplates = (industry: string): TemplateBlock[] => {
   
   if (industry === 'Catering') {
     return CATERING_TEMPLATES;
+  }
+  
+  if (industry === 'Web Development') {
+    return NORTHCELL_STUDIOS_TEMPLATES;
   }
   
   // Default templates for other industries
