@@ -476,7 +476,28 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
               <div>
                 {templates.find(t => t.id === potentialTemplate) && (
                   <div>
-                    <p className="font-bold mb-4 text-gray-700">{templates.find(t => t.id === potentialTemplate)?.name}</p>
+                    <div className="flex justify-between items-center mb-4">
+                      <p className="font-bold text-gray-700">{templates.find(t => t.id === potentialTemplate)?.name}</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            const template = templates.find(t => t.id === potentialTemplate);
+                            if (template?.items) {
+                              setSelectedTemplateItems(new Set(template.items.map(i => i.id)));
+                            }
+                          }}
+                          className="text-xs px-3 py-1 border border-grit-dark hover:bg-grit-primary transition-colors"
+                        >
+                          Select All
+                        </button>
+                        <button
+                          onClick={() => setSelectedTemplateItems(new Set())}
+                          className="text-xs px-3 py-1 border border-grit-dark hover:bg-gray-200 transition-colors"
+                        >
+                          Deselect All
+                        </button>
+                      </div>
+                    </div>
                     <div className="space-y-2 mb-6 max-h-64 overflow-y-auto border-2 border-gray-200 p-4">
                       {templates.find(t => t.id === potentialTemplate)?.items?.map(item => (
                         <label key={item.id} className="flex items-start gap-3 p-3 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer">
@@ -502,15 +523,22 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
                       <button
                         onClick={() => {
                           const template = templates.find(t => t.id === potentialTemplate);
-                          if (template && template.items) {
+                          if (template && template.items && doc) {
                             const itemsToAdd = template.items.filter(i => selectedTemplateItems.has(i.id));
+                            const newItems = [...(doc.items || [])];
+                            const timestamp = Date.now();
+                            
                             itemsToAdd.forEach((item, index) => {
-                              handleAddItem({
+                              newItems.push({
                                 ...item,
-                                id: `${Date.now()}-${index}`,
-                                templateBlockName: template.name // Add template block name!
+                                id: `${timestamp}-${index}`,
+                                templateBlockName: template.name
                               });
                             });
+                            
+                            const totals = calculateTotals(newItems);
+                            updateDoc({ ...doc, items: newItems, ...totals });
+                            triggerHaptic('success');
                           }
                           setShowAddMenu(false);
                           setPotentialTemplate(null);

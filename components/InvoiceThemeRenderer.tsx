@@ -50,6 +50,11 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
     return acc;
   }, {} as Record<string, InvoiceItem[]>);
 
+  // Calculate total for a block
+  const calculateBlockTotal = (items: InvoiceItem[]) => {
+    return items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+  };
+
   const renderRowContent = (item: InvoiceItem, classNames: { td?: string, input?: string, tr?: string } = {}) => {
     return (
       <tr key={item.id} className={`${classNames.tr || ''} pdf-item-row`}>
@@ -210,6 +215,10 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
                   </tr>
                 )}
                 {items.map((item) => renderRowContent(item, { tr: 'border-b border-gray-100 group' }))}
+                <tr className="border-t-2 border-gray-300">
+                  <td colSpan={viewMode === 'Draft' ? 4 : 3} className="py-3 text-right text-xs font-bold uppercase tracking-widest text-gray-400">Total {blockName}:</td>
+                  <td className="py-3 text-right font-bold">{profile.currency}{calculateBlockTotal(items).toFixed(2)}</td>
+                </tr>
               </React.Fragment>
             ))}
             {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-8 text-center"><button onClick={onAddItem} className="text-xs font-bold uppercase tracking-widest border border-gray-200 px-4 py-2 hover:bg-black hover:text-white transition-colors rounded-full">+ Add Line Item</button></td></tr>}
@@ -312,6 +321,10 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
                   </tr>
                 )}
                 {items.map((item) => renderRowContent(item, { tr: 'border-b-2 border-gray-300' }))}
+                <tr className="border-t-4 border-black">
+                  <td colSpan={viewMode === 'Draft' ? 4 : 3} className="py-3 text-right font-bold uppercase tracking-wider text-sm">Total {blockName}:</td>
+                  <td className="py-3 text-right font-black text-lg">{profile.currency}{calculateBlockTotal(items).toFixed(2)}</td>
+                </tr>
               </React.Fragment>
             ))}
             {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-6 text-center"><button onClick={onAddItem} className="font-bold uppercase text-xs border-2 border-black px-6 py-2 hover:bg-black hover:text-white transition-colors">+ Add Item</button></td></tr>}
@@ -414,6 +427,10 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
                   </tr>
                 )}
                 {items.map((item) => renderRowContent(item, { tr: 'border-b border-gray-100 group hover:bg-amber-50/20', td: 'py-5', input: 'text-sm' }))}
+                <tr className="border-t border-amber-600">
+                  <td colSpan={viewMode === 'Draft' ? 4 : 3} className="py-4 text-right text-xs tracking-[0.15em] uppercase font-medium text-gray-600">Total {blockName}:</td>
+                  <td className="py-4 text-right font-medium text-gray-900">{profile.currency}{calculateBlockTotal(items).toFixed(2)}</td>
+                </tr>
               </React.Fragment>
             ))}
             {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-12 text-center"><button onClick={onAddItem} className="text-xs tracking-widest uppercase text-gray-400 hover:text-black transition-colors">+ Add Line</button></td></tr>}
@@ -505,6 +522,10 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
                     </tr>
                   )}
                   {items.map((item) => renderRowContent(item, { tr: 'border-b border-gray-200 hover:bg-violet-50/30', td: 'py-4' }))}
+                  <tr className="border-t-2 border-violet-600">
+                    <td colSpan={viewMode === 'Draft' ? 4 : 3} className="py-3 text-right text-xs tracking-[0.2em] uppercase font-black">Total {blockName}:</td>
+                    <td className="py-3 text-right font-black">{profile.currency}{calculateBlockTotal(items).toFixed(2)}</td>
+                  </tr>
                 </React.Fragment>
               ))}
               {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-8 text-center"><button onClick={onAddItem} className="font-black text-xs border-2 border-black px-8 py-3 hover:bg-black hover:text-white transition-all hover:scale-105">+ ADD LINE</button></td></tr>}
@@ -608,6 +629,10 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
                   </tr>
                 )}
                 {items.map((item) => renderRowContent(item, { tr: 'border-b border-gray-50 hover:bg-gray-50/50', td: 'py-5', input: 'text-sm' }))}
+                <tr className="border-t border-gray-200">
+                  <td colSpan={viewMode === 'Draft' ? 4 : 3} className="py-4 text-right text-xs tracking-[0.15em] uppercase font-medium text-gray-700">Total {blockName}:</td>
+                  <td className="py-4 text-right font-medium text-gray-900">{profile.currency}{calculateBlockTotal(items).toFixed(2)}</td>
+                </tr>
               </React.Fragment>
             ))}
             {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-12 text-center"><button onClick={onAddItem} className="text-xs text-gray-400 hover:text-black transition-colors tracking-wider">+ Add Line Item</button></td></tr>}
@@ -667,10 +692,27 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
       </section>
       <main className="flex-1">
           <table className="w-full text-left">
-            <thead><tr className="border-b-2 border-[#A1887F]">{viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}<th className="pb-2 font-bold">Item</th><th className="pb-2 font-bold text-right">Quantity</th><th className="pb-2 font-bold text-right">Price</th><th className="pb-2 font-bold text-right">Total</th></tr></thead>
+            <thead><tr className="border-b-2 border-[#A1887F]">{viewMode === 'Draft' && <th className="w-12 print:hidden"></th>}<th className="pb-2 font-bold w-20 text-center">Qty</th><th className="pb-2 font-bold w-20 text-center">Unit</th><th className="pb-2 font-bold">Description</th><th className="pb-2 font-bold text-right">Unit Price</th><th className="pb-2 font-bold text-right">Total</th></tr></thead>
             <tbody>
-                {doc.items?.map((item) => renderRowContent(item, { tr: 'border-b border-[#EFEBE9]' }))}
-                {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={5} className="py-6 text-center"><button onClick={onAddItem} className="font-bold text-xs border-2 border-[#D7CCC8] px-4 py-2 hover:bg-[#5D4037] hover:text-white transition-colors rounded">+ Add Item</button></td></tr>}
+                {Object.entries(groupedItems).map(([blockName, items]: [string, InvoiceItem[]]) => (
+                  <React.Fragment key={blockName}>
+                    {blockName !== 'Items' && (
+                      <tr>
+                        <td colSpan={viewMode === 'Draft' ? 6 : 5} className="pt-6 pb-2">
+                          <div className="font-bold text-sm uppercase tracking-wider text-[#A1887F] border-b border-[#D7CCC8] pb-1">
+                            {blockName}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    {items.map((item) => renderRowContent(item, { tr: 'border-b border-[#EFEBE9]' }))}
+                    <tr className="border-t-2 border-[#D7CCC8]">
+                      <td colSpan={viewMode === 'Draft' ? 4 : 3} className="py-3 text-right text-xs uppercase tracking-widest text-[#A1887F] font-bold">Total {blockName}:</td>
+                      <td className="py-3 text-right font-bold text-[#5D4037]">{profile.currency}{calculateBlockTotal(items).toFixed(2)}</td>
+                    </tr>
+                  </React.Fragment>
+                ))}
+                {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-6 text-center"><button onClick={onAddItem} className="font-bold text-xs border-2 border-[#D7CCC8] px-4 py-2 hover:bg-[#5D4037] hover:text-white transition-colors rounded">+ Add Item</button></td></tr>}
             </tbody>
         </table>
       </main>
@@ -740,6 +782,10 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
                       </tr>
                     )}
                     {items.map((item) => renderRowContent(item, { tr: 'bg-gray-50 border-b-4 border-white', td: 'p-3' }))}
+                    <tr className="border-t-2 border-blue-500 bg-gray-100">
+                      <td colSpan={viewMode === 'Draft' ? 4 : 3} className="p-3 text-right text-sm font-black uppercase tracking-widest">Total {blockName}:</td>
+                      <td className="p-3 text-right font-black">{profile.currency}{calculateBlockTotal(items).toFixed(2)}</td>
+                    </tr>
                   </React.Fragment>
                 ))}
                 {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-6 text-center bg-gray-50"><button onClick={onAddItem} className="text-xs font-bold uppercase border border-gray-300 px-4 py-2 hover:bg-gray-800 hover:text-white transition-colors">+ Add Item</button></td></tr>}
@@ -815,6 +861,10 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
                       </tr>
                     )}
                     {items.map((item) => renderRowContent(item, { tr: 'border-b-4 border-gray-200' }))}
+                    <tr className="border-t-8 border-yellow-400 bg-gray-100">
+                      <td colSpan={viewMode === 'Draft' ? 4 : 3} className="py-4 text-right text-sm font-black uppercase tracking-[0.2em]">Total {blockName}:</td>
+                      <td className="py-4 text-right font-black text-lg">{profile.currency}{calculateBlockTotal(items).toFixed(2)}</td>
+                    </tr>
                   </React.Fragment>
                 ))}
                 {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-6 text-center"><button onClick={onAddItem} className="font-black text-xs border-4 border-gray-900 px-6 py-3 hover:bg-gray-900 hover:text-white transition-colors">+ ADD</button></td></tr>}
@@ -893,6 +943,10 @@ export const InvoiceThemeRenderer: React.FC<InvoiceThemeRendererProps> = ({
                         </tr>
                       )}
                       {items.map((item) => renderRowContent(item, { tr: 'border-b-2 border-gray-200' }))}
+                      <tr className="border-t-4 border-indigo-600">
+                        <td colSpan={viewMode === 'Draft' ? 4 : 3} className="py-3 text-right text-sm font-black uppercase tracking-[0.2em] text-indigo-600">Total {blockName}:</td>
+                        <td className="py-3 text-right font-black text-indigo-900">{profile.currency}{calculateBlockTotal(items).toFixed(2)}</td>
+                      </tr>
                     </React.Fragment>
                   ))}
                   {viewMode === 'Draft' && <tr className="print:hidden"><td colSpan={6} className="py-6 text-center"><button onClick={onAddItem} className="text-xs font-bold uppercase border-2 border-indigo-600 px-6 py-2 hover:bg-indigo-600 hover:text-white transition-colors">+ Add Item</button></td></tr>}
