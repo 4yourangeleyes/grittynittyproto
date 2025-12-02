@@ -472,7 +472,7 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
                             <span className="font-bold text-gray-500 text-sm">{globalIndex + 1}.</span>
                             <h3 className={`${styles.clauseTitle} font-bold`}>{clause.title}</h3>
                           </div>
-                          <p className={`${styles.clauseContent} text-sm leading-relaxed ml-6`}>{clause.content}</p>
+                          <p className={`${styles.clauseContent} text-sm leading-relaxed ml-6 whitespace-pre-wrap`}>{clause.content}</p>
                         </div>
                       );
                     })}
@@ -767,7 +767,7 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
               placeholder="Clause content..."
             />
           ) : (
-            <p className={styles.clauseContent}>{clause.content}</p>
+            <p className={`${styles.clauseContent} whitespace-pre-wrap`}>{clause.content}</p>
           )}
         </div>
       ))}
