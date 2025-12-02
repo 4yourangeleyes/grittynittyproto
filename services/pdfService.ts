@@ -194,7 +194,13 @@ export const extractInvoiceHTML = (invoiceElement: HTMLElement | null): string =
     }
   });
 
-  // 4. Ensure Images are preserved
+  // 4. Ensure whitespace-pre-wrap is applied as inline style (for html2canvas)
+  const whitespaceElements = clone.querySelectorAll('.whitespace-pre-wrap');
+  whitespaceElements.forEach(el => {
+    (el as HTMLElement).style.whiteSpace = 'pre-wrap';
+  });
+
+  // 5. Ensure Images are preserved
   const images = clone.querySelectorAll('img');
   images.forEach(img => {
     // Ensure crossOrigin is set if needed, though usually handled by html2canvas options
