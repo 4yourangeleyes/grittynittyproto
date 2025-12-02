@@ -330,7 +330,7 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
           
           .preview-page-header {
             position: absolute;
-            top: 10mm;
+            top: 5mm;
             left: 20mm;
             right: 20mm;
             padding-bottom: 5mm;
@@ -387,7 +387,7 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
               <span>Page 1</span>
             </div>
             
-            <div style={{ paddingTop: '15mm' }}>
+            <div style={{ paddingTop: '8mm' }}>
               <div className={`${styles.header}`}>
                 <h1 className={styles.title}>{doc.title}</h1>
                 {doc.contractType && <p className={styles.subtitle}>{doc.contractType}</p>}
@@ -459,7 +459,7 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
                     <span>Page {currentPageNum}</span>
                   </div>
                   
-                  <div style={{ paddingTop: '15mm' }}>
+                  <div style={{ paddingTop: '8mm' }}>
                     {pageIndex === 0 && (
                       <h2 className={`${styles.sectionTitle} mb-6`}>TERMS AND CONDITIONS</h2>
                     )}
@@ -492,7 +492,7 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
               <span>Page {Math.ceil(sortedClauses.length / 3) + 2}</span>
             </div>
             
-            <div style={{ paddingTop: '15mm' }}>
+            <div style={{ paddingTop: '8mm' }}>
               <h2 className={`${styles.sectionTitle} mb-8`}>SIGNATURES</h2>
               
               <div className="grid grid-cols-2 gap-12 mt-12">
