@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import supabaseClient from './services/supabaseClient';
 import { useDocuments } from './hooks/useDocuments';
 import { useClients } from './hooks/useClients';
+import { useTemplates } from './hooks/useTemplates';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { DocumentCreationWizard } from './components/DocumentCreationWizard';
 import { ContractType } from './types';
@@ -156,12 +157,10 @@ const Layout: React.FC<{
 };
 
 export default function App() {
-  // Remove duplicate auth state - AuthContext is the single source of truth
-  const [templates, setTemplates] = useState<TemplateBlock[]>(() => loadState('grit_templates', []));
+  // Remove localStorage-based templates - use Supabase instead
   const [itemUsage, setItemUsage] = useState<Record<string, number>>(() => loadState('grit_item_usage', {}));
   const [currentDoc, setCurrentDoc] = useState<DocumentData | null>(null);
 
-  useEffect(() => localStorage.setItem('grit_templates', JSON.stringify(templates)), [templates]);
   useEffect(() => localStorage.setItem('grit_item_usage', JSON.stringify(itemUsage)), [itemUsage]);
 
   const handleDocumentCreated = (doc: DocumentData) => {
@@ -197,8 +196,6 @@ export default function App() {
     <HashRouter>
       <AuthProvider>
         <AppRoutes 
-          templates={templates}
-          setTemplates={setTemplates}
           currentDoc={currentDoc}
           setCurrentDoc={setCurrentDoc}
           handleDocumentCreated={handleDocumentCreated}
@@ -227,7 +224,13 @@ const AppRoutes: React.FC<any> = (props) => {
     loadState('grit_clients', [])
   );
   
+  // Load templates from Supabase
+  const { templates, setTemplates, saveTemplate, deleteTemplate, isLoading: templatesLoading } = useTemplates(
+    getIndustryTemplates(profile?.industry || 'Web Development')
+  );
+  
   console.log('[AppRoutes] Render:', { isAuthenticated, isLoading, path: window.location.hash });
+  console.log('[AppRoutes] Templates:', templates.length, 'templates loaded');
 
   // Listen for industry login to seed data
   useEffect(() => {
@@ -238,12 +241,6 @@ const AppRoutes: React.FC<any> = (props) => {
          const demoInvoice = getIndustryExampleInvoice(profile.industry, profile.companyName);
          saveDocument(demoInvoice);
          console.log('Seeded Demo Invoice for', profile.industry);
-       }
-       
-       // Also seed templates if empty
-       if (props.templates.length === 0) {
-         const industryTemplates = getIndustryTemplates(profile.industry);
-         props.setTemplates(industryTemplates);
        }
     }
   }, [profile, documents.length]);
@@ -403,8 +400,8 @@ const AppRoutes: React.FC<any> = (props) => {
                        setClients={setClients} 
                        profile={profile || INITIAL_PROFILE} 
                        onDocGenerated={props.handleDocumentCreated} 
-                       templates={props.templates} 
-                       setTemplates={props.setTemplates}
+                       templates={templates} 
+                       setTemplates={setTemplates}
                     /> 
             } />
             
@@ -415,8 +412,8 @@ const AppRoutes: React.FC<any> = (props) => {
                        doc={props.currentDoc} 
                        profile={profile || INITIAL_PROFILE} 
                        updateDoc={props.setCurrentDoc} 
-                       templates={props.templates} 
-                       setTemplates={props.setTemplates}
+                       templates={templates} 
+                       setTemplates={setTemplates}
                        onSave={handleSaveDocument} 
                        itemUsage={props.itemUsage}
                        onTrackItemUsage={props.trackItemUsage}
@@ -427,7 +424,7 @@ const AppRoutes: React.FC<any> = (props) => {
 
             <Route path="/documents" element={!isAuthenticated ? <Navigate to="/login" replace /> : <DocumentsScreen documents={documents} openDocument={props.setCurrentDoc} />} />
             <Route path="/clients" element={!isAuthenticated ? <Navigate to="/login" replace /> : <ClientsScreen clients={clients} documents={documents} saveClient={saveClient} deleteClient={deleteClient} />} />
-            <Route path="/settings" element={!isAuthenticated ? <Navigate to="/login" replace /> : <SettingsScreen clients={clients} setClients={setClients} templates={props.templates} setTemplates={props.setTemplates} saveClient={saveClient} deleteClient={deleteClient} />} />
+            <Route path="/settings" element={!isAuthenticated ? <Navigate to="/login" replace /> : <SettingsScreen clients={clients} setClients={setClients} templates={templates} setTemplates={setTemplates} saveClient={saveClient} deleteClient={deleteClient} />} />
           </Routes>
         </Suspense>
       </ErrorBoundary>
