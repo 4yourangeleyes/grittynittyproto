@@ -35,7 +35,7 @@ export const generateInvoicePDF = async (
     container.innerHTML = invoiceHtml;
     container.style.position = 'absolute';
     container.style.left = '-10000px';
-    container.style.width = '800px';
+    container.style.width = '210mm'; // Match preview page width exactly
     container.style.backgroundColor = 'white';
     globalThis.document.body.appendChild(container);
 
@@ -200,7 +200,22 @@ export const extractInvoiceHTML = (invoiceElement: HTMLElement | null): string =
     (el as HTMLElement).style.whiteSpace = 'pre-wrap';
   });
 
-  // 5. Ensure Images are preserved
+  // 5. Remove preview container styling - make it look like the actual pages
+  const previewContainer = clone.querySelector('.preview-page-container') as HTMLElement;
+  if (previewContainer) {
+    previewContainer.style.background = 'transparent';
+    previewContainer.style.padding = '0';
+    previewContainer.style.gap = '0';
+  }
+
+  // 6. Remove box shadow from preview pages for clean PDF
+  const previewPages = clone.querySelectorAll('.preview-page');
+  previewPages.forEach(page => {
+    (page as HTMLElement).style.boxShadow = 'none';
+    (page as HTMLElement).style.margin = '0';
+  });
+
+  // 7. Ensure Images are preserved
   const images = clone.querySelectorAll('img');
   images.forEach(img => {
     // Ensure crossOrigin is set if needed, though usually handled by html2canvas options
