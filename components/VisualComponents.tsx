@@ -79,7 +79,9 @@ export const PieChart: React.FC<PieChartProps> = ({ data, title, editable, onUpd
   };
 
   const createSlicePath = (percentage: number, startAngle: number): string => {
-    const angle = (percentage / 100) * 360;
+    // Use actual percentage value directly, normalized to total if needed
+    const normalizedPercentage = total > 0 ? (percentage / total) * 100 : 0;
+    const angle = (normalizedPercentage / 100) * 360;
     const endAngle = startAngle + angle;
     
     const startRad = (startAngle * Math.PI) / 180;
@@ -121,19 +123,24 @@ export const PieChart: React.FC<PieChartProps> = ({ data, title, editable, onUpd
         {/* Pie Chart */}
         <div className="flex-shrink-0">
           <svg width="200" height="200" viewBox="0 0 200 200">
-            {sections.map((section, index) => {
-              const slice = createSlicePath(section.percentage, currentAngle);
-              currentAngle += (section.percentage / 100) * 360;
-              return (
-                <path
-                  key={index}
-                  d={slice}
-                  fill={section.color}
-                  stroke="white"
-                  strokeWidth="2"
-                />
-              );
-            })}
+            {(() => {
+              let angle = -90; // Start from top
+              return sections.map((section, index) => {
+                const slice = createSlicePath(section.percentage, angle);
+                // Calculate next angle using normalized percentage
+                const normalizedPercentage = total > 0 ? (section.percentage / total) * 100 : 0;
+                angle += (normalizedPercentage / 100) * 360;
+                return (
+                  <path
+                    key={index}
+                    d={slice}
+                    fill={section.color}
+                    stroke="white"
+                    strokeWidth="2"
+                  />
+                );
+              });
+            })()}
           </svg>
         </div>
 
@@ -513,6 +520,114 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({ title, items, curr
           </tr>
         </tbody>
       </table>
+    </div>
+  );
+};
+
+// Bar Chart Component - Comparison visualization
+interface BarChartItem {
+  label: string;
+  value: number;
+  color: string;
+}
+
+interface BarChartProps {
+  title: string;
+  items: BarChartItem[];
+  unit: string;
+  editable: boolean;
+  onUpdate?: (items: BarChartItem[]) => void;
+}
+
+export const BarChart: React.FC<BarChartProps> = ({ title, items, unit, editable, onUpdate }) => {
+  const [bars, setBars] = useState(items);
+
+  const maxValue = Math.max(...bars.map(b => b.value), 1);
+
+  const addBar = () => {
+    const updated = [...bars, { label: 'New Item', value: 50, color: COLORS[bars.length % COLORS.length] }];
+    setBars(updated);
+    onUpdate?.(updated);
+  };
+
+  const updateBar = (index: number, field: keyof BarChartItem, value: any) => {
+    const updated = bars.map((b, i) => i === index ? { ...b, [field]: value } : b);
+    setBars(updated);
+    onUpdate?.(updated);
+  };
+
+  const deleteBar = (index: number) => {
+    const updated = bars.filter((_, i) => i !== index);
+    setBars(updated);
+    onUpdate?.(updated);
+  };
+
+  return (
+    <div className="my-8 p-6 border border-gray-300 bg-gray-50 rounded print:break-inside-avoid">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="font-bold text-lg">{title}</h3>
+        {editable && (
+          <button onClick={addBar} className="p-2 hover:bg-gray-200 rounded print:hidden">
+            <Plus size={16} />
+          </button>
+        )}
+      </div>
+
+      <div className="space-y-4">
+        {bars.map((bar, index) => (
+          <div key={index}>
+            {editable ? (
+              <div className="flex gap-2 items-center mb-2">
+                <input
+                  type="color"
+                  value={bar.color}
+                  onChange={(e) => updateBar(index, 'color', e.target.value)}
+                  className="w-8 h-8 rounded"
+                />
+                <input
+                  type="text"
+                  value={bar.label}
+                  onChange={(e) => updateBar(index, 'label', e.target.value)}
+                  className="flex-1 px-2 py-1 border border-gray-300 rounded"
+                  placeholder="Label"
+                />
+                <input
+                  type="number"
+                  value={bar.value}
+                  onChange={(e) => updateBar(index, 'value', parseFloat(e.target.value) || 0)}
+                  className="w-24 px-2 py-1 border border-gray-300 rounded"
+                />
+                <span className="text-sm text-gray-600">{unit}</span>
+                <button
+                  onClick={() => deleteBar(index)}
+                  className="p-1 hover:bg-red-100 rounded text-red-600 print:hidden"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-medium w-32">{bar.label}</span>
+                <span className="text-sm text-gray-600">{bar.value} {unit}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <div className="flex-1 bg-gray-200 rounded h-8">
+                <div
+                  className="h-full rounded flex items-center justify-end pr-2 text-white text-sm font-bold"
+                  style={{
+                    width: `${(bar.value / maxValue) * 100}%`,
+                    backgroundColor: bar.color,
+                    minWidth: bar.value > 0 ? '40px' : '0',
+                  }}
+                >
+                  {bar.value > 0 && `${bar.value}`}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -544,12 +544,66 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
             return pages;
           })()}
 
+          {/* Visual Components Pages - Before Signatures */}
+          {doc.visualComponents && doc.visualComponents.length > 0 && (
+            <div className="preview-page">
+              <div className="preview-page-header">
+                <span className="font-bold">{profile.companyName}</span>
+                <span>{doc.contractType || 'Contract'}</span>
+                <span>Page {Math.ceil(sortedClauses.length / 3) + 2}</span>
+              </div>
+              
+              <div style={{ paddingTop: '18mm' }}>
+                {doc.visualComponents.map(component => (
+                  <div key={component.id} className="mb-8">
+                    {component.type === 'pie-chart' && (
+                      <PieChart
+                        title={component.title}
+                        data={component.data}
+                        editable={false}
+                        onUpdate={() => {}}
+                      />
+                    )}
+                    
+                    {component.type === 'timeline' && (
+                      <Timeline
+                        title={component.title}
+                        items={component.data}
+                        editable={false}
+                        onUpdate={() => {}}
+                      />
+                    )}
+                    
+                    {component.type === 'tech-stack' && (
+                      <TechStack
+                        title={component.title}
+                        stack={component.data}
+                        editable={false}
+                        onUpdate={() => {}}
+                      />
+                    )}
+                    
+                    {component.type === 'cost-breakdown' && (
+                      <CostBreakdown
+                        title={component.title}
+                        items={component.data}
+                        currency={profile.currency}
+                        editable={false}
+                        onUpdate={() => {}}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Final Page - Signatures */}
           <div className="preview-page">
             <div className="preview-page-header">
               <span className="font-bold">{profile.companyName}</span>
               <span>{doc.contractType || 'Contract'}</span>
-              <span>Page {Math.ceil(sortedClauses.length / 3) + 2}</span>
+              <span>Page {Math.ceil(sortedClauses.length / 3) + (doc.visualComponents?.length ? 3 : 2)}</span>
             </div>
             
             <div style={{ paddingTop: '18mm' }}>
