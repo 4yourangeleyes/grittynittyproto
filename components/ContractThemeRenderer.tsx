@@ -4,10 +4,11 @@
  * All pages are print-ready and legally formatted
  */
 
-import React from 'react';
-import { DocumentData, UserProfile, ContractClause, ContractTheme, ContractSignature } from '../types';
+import React, { useState } from 'react';
+import { DocumentData, UserProfile, ContractClause, ContractTheme, ContractSignature, VisualComponent } from '../types';
 import { Input, TextArea } from './Input';
-import { Trash2, Plus, GripVertical } from 'lucide-react';
+import { Trash2, Plus, GripVertical, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
+import { PieChart, Timeline, TechStack, CostBreakdown } from './VisualComponents';
 
 interface ContractThemeRendererProps {
   doc: DocumentData;
@@ -26,6 +27,8 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
   onAddClause,
   onDeleteClause,
 }) => {
+
+  const [showVisualMenu, setShowVisualMenu] = useState(false);
 
   // Add page numbering on mount for print
   React.useEffect(() => {
@@ -71,6 +74,61 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
         [field]: value 
       } 
     });
+  };
+
+  const addVisualComponent = (type: VisualComponent['type']) => {
+    const defaultData: Record<VisualComponent['type'], any> = {
+      'pie-chart': [
+        { label: 'Section 1', percentage: 40, color: '#3B82F6' },
+        { label: 'Section 2', percentage: 30, color: '#10B981' },
+        { label: 'Section 3', percentage: 30, color: '#F59E0B' },
+      ],
+      'timeline': [
+        { phase: 'Phase 1', duration: '2 weeks', description: 'Initial setup' },
+        { phase: 'Phase 2', duration: '4 weeks', description: 'Development' },
+        { phase: 'Phase 3', duration: '1 week', description: 'Testing & Launch' },
+      ],
+      'tech-stack': [
+        { name: 'React', category: 'Frontend' },
+        { name: 'Node.js', category: 'Backend' },
+        { name: 'PostgreSQL', category: 'Database' },
+      ],
+      'cost-breakdown': [
+        { item: 'Development', quantity: 40, rate: 500, total: 20000 },
+        { item: 'Design', quantity: 20, rate: 400, total: 8000 },
+      ],
+      'bar-chart': [],
+      'site-architecture': [],
+      'project-phases': [],
+      'pipe-diagram': [],
+      'feature-matrix': [],
+    };
+
+    const newComponent: VisualComponent = {
+      id: Date.now().toString(),
+      type,
+      title: type.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+      data: defaultData[type],
+      position: (doc.visualComponents?.length || 0) + 1,
+    };
+
+    updateDoc({
+      ...doc,
+      visualComponents: [...(doc.visualComponents || []), newComponent],
+    });
+    setShowVisualMenu(false);
+  };
+
+  const updateVisualComponent = (id: string, data: any) => {
+    const updated = (doc.visualComponents || []).map(vc =>
+      vc.id === id ? { ...vc, data } : vc
+    );
+    updateDoc({ ...doc, visualComponents: updated });
+  };
+
+  const deleteVisualComponent = (id: string) => {
+    const updated = (doc.visualComponents || []).filter(vc => vc.id !== id);
+    updateDoc({ ...doc, visualComponents: updated });
   };
 
   const sortedClauses = doc.clauses?.sort((a, b) => (a.order || 0) - (b.order || 0)) || [];
@@ -404,9 +462,11 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
                 <h3 className="font-bold text-base mb-2">SERVICE PROVIDER</h3>
                 <p className="font-bold">{profile.companyName}</p>
                 {profile.registrationNumber && <p className="text-sm">Reg: {profile.registrationNumber}</p>}
+                {profile.vatRegistrationNumber && <p className="text-sm">VAT: {profile.vatRegistrationNumber}</p>}
                 {profile.address && <p className="text-sm">{profile.address}</p>}
                 {profile.phone && <p className="text-sm">{profile.phone}</p>}
                 <p className="text-sm">{profile.email}</p>
+                {profile.website && <p className="text-sm">{profile.website}</p>}
               </div>
 
               <div className={`${styles.partySection} mb-6`}>
@@ -598,16 +658,21 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
           <>
             <Input value={profile.companyName} disabled className="mb-2 bg-gray-100" />
             <Input value={profile.registrationNumber || ''} placeholder="Registration Number" disabled className="mb-2 bg-gray-100" />
+            <Input value={profile.vatRegistrationNumber || ''} placeholder="VAT Number" disabled className="mb-2 bg-gray-100" />
             <Input value={profile.address || ''} placeholder="Address" disabled className="mb-2 bg-gray-100" />
             <Input value={profile.phone || ''} placeholder="Phone" disabled className="mb-2 bg-gray-100" />
-            <Input value={profile.email} disabled className="bg-gray-100" />
+            <Input value={profile.email} disabled className="mb-2 bg-gray-100" />
+            <Input value={profile.website || ''} placeholder="Website" disabled className="bg-gray-100" />
           </>
         ) : (
           <>
             <p className="font-bold">{profile.companyName}</p>
             {profile.registrationNumber && <p>Registration: {profile.registrationNumber}</p>}
+            {profile.vatRegistrationNumber && <p>VAT: {profile.vatRegistrationNumber}</p>}
             {profile.address && <p>{profile.address}</p>}
+            {profile.phone && <p>{profile.phone}</p>}
             <p>{profile.email}</p>
+            {profile.website && <p>{profile.website}</p>}
           </>
         )}
       </div>
@@ -773,14 +838,114 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
       ))}
 
       {viewMode === 'Draft' && (
-        <button
-          onClick={onAddClause}
-          className="w-full py-3 border-2 border-dashed border-gray-400 hover:border-blue-600 hover:bg-blue-50 transition-colors font-bold text-gray-600 hover:text-blue-600 flex items-center justify-center gap-2 print:hidden"
-        >
-          <Plus size={20} /> Add Clause
-        </button>
+        <>
+          <button
+            onClick={onAddClause}
+            className="w-full py-3 border-2 border-dashed border-gray-400 hover:border-blue-600 hover:bg-blue-50 transition-colors font-bold text-gray-600 hover:text-blue-600 flex items-center justify-center gap-2 print:hidden mb-2"
+          >
+            <Plus size={20} /> Add Clause
+          </button>
+          
+          <div className="relative print:hidden">
+            <button
+              onClick={() => setShowVisualMenu(!showVisualMenu)}
+              className="w-full py-3 border-2 border-dashed border-green-400 hover:border-green-600 hover:bg-green-50 transition-colors font-bold text-green-600 hover:text-green-700 flex items-center justify-center gap-2"
+            >
+              <BarChart3 size={20} /> Add Visual Component
+            </button>
+            
+            {showVisualMenu && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-green-600 rounded shadow-lg z-10 p-4 grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => addVisualComponent('pie-chart')}
+                  className="p-3 hover:bg-green-50 border border-gray-300 rounded text-left"
+                >
+                  <PieChartIcon size={16} className="inline mr-2" />
+                  Pie Chart
+                </button>
+                <button
+                  onClick={() => addVisualComponent('timeline')}
+                  className="p-3 hover:bg-green-50 border border-gray-300 rounded text-left"
+                >
+                  Timeline
+                </button>
+                <button
+                  onClick={() => addVisualComponent('tech-stack')}
+                  className="p-3 hover:bg-green-50 border border-gray-300 rounded text-left"
+                >
+                  Tech Stack
+                </button>
+                <button
+                  onClick={() => addVisualComponent('cost-breakdown')}
+                  className="p-3 hover:bg-green-50 border border-gray-300 rounded text-left"
+                >
+                  Cost Breakdown
+                </button>
+              </div>
+            )}
+          </div>
+        </>
       )}
       </div>
+
+      {/* VISUAL COMPONENTS SECTION */}
+      {doc.visualComponents && doc.visualComponents.length > 0 && (
+        <div className="my-8">
+          {doc.visualComponents.map(component => {
+            const editable = viewMode === 'Draft';
+            
+            return (
+              <div key={component.id} className="relative group">
+                {editable && (
+                  <button
+                    onClick={() => deleteVisualComponent(component.id)}
+                    className="absolute -top-2 -right-2 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity print:hidden z-10"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
+                
+                {component.type === 'pie-chart' && (
+                  <PieChart
+                    title={component.title}
+                    data={component.data}
+                    editable={editable}
+                    onUpdate={(data) => updateVisualComponent(component.id, data)}
+                  />
+                )}
+                
+                {component.type === 'timeline' && (
+                  <Timeline
+                    title={component.title}
+                    items={component.data}
+                    editable={editable}
+                    onUpdate={(data) => updateVisualComponent(component.id, data)}
+                  />
+                )}
+                
+                {component.type === 'tech-stack' && (
+                  <TechStack
+                    title={component.title}
+                    stack={component.data}
+                    editable={editable}
+                    onUpdate={(data) => updateVisualComponent(component.id, data)}
+                  />
+                )}
+                
+                {component.type === 'cost-breakdown' && (
+                  <CostBreakdown
+                    title={component.title}
+                    items={component.data}
+                    currency={profile.currency}
+                    editable={editable}
+                    onUpdate={(data) => updateVisualComponent(component.id, data)}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* SIGNATURE SECTION */}
       <div className={`${styles.signatureBox} signature-section`}>

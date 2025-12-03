@@ -67,6 +67,14 @@ export interface ContractSignature {
   signatureData?: string; // Base64 image or digital signature
 }
 
+export interface VisualComponent {
+  id: string;
+  type: 'pie-chart' | 'bar-chart' | 'timeline' | 'cost-breakdown' | 'tech-stack' | 'site-architecture' | 'project-phases' | 'pipe-diagram' | 'feature-matrix';
+  title: string;
+  data: any;
+  position: number; // Order in document
+}
+
 export interface ContractTerms {
   startDate: string;
   endDate?: string;
@@ -107,6 +115,7 @@ export interface DocumentData {
   signatures?: ContractSignature[];
   scopeOfWork?: string;
   deliverables?: string[];
+  visualComponents?: VisualComponent[]; // Charts, diagrams, timelines
   // HR/Generic
   bodyText?: string;
 }
