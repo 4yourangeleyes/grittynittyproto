@@ -7,8 +7,8 @@
 import React, { useState } from 'react';
 import { DocumentData, UserProfile, ContractClause, ContractTheme, ContractSignature, VisualComponent } from '../types';
 import { Input, TextArea } from './Input';
-import { Trash2, Plus, GripVertical, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
-import { PieChart, Timeline, TechStack, CostBreakdown } from './VisualComponents';
+import { Trash2, Plus, GripVertical, BarChart3, PieChart as PieChartIcon, Clock, Code, DollarSign } from 'lucide-react';
+import { PieChart, Timeline, TechStack, CostBreakdown, BarChart } from './VisualComponents';
 
 interface ContractThemeRendererProps {
   doc: DocumentData;
@@ -97,7 +97,11 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
         { item: 'Development', quantity: 40, rate: 500, total: 20000 },
         { item: 'Design', quantity: 20, rate: 400, total: 8000 },
       ],
-      'bar-chart': [],
+      'bar-chart': [
+        { label: 'Item 1', value: 75, color: '#3B82F6' },
+        { label: 'Item 2', value: 50, color: '#10B981' },
+        { label: 'Item 3', value: 90, color: '#F59E0B' },
+      ],
       'site-architecture': [],
       'project-phases': [],
       'pipe-diagram': [],
@@ -911,28 +915,38 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
             {showVisualMenu && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-green-600 rounded shadow-lg z-10 p-4 grid grid-cols-2 gap-2">
                 <button
-                  onClick={() => addVisualComponent('pie-chart')}
+                  onClick={() => { addVisualComponent('pie-chart'); setShowVisualMenu(false); }}
                   className="p-3 hover:bg-green-50 border border-gray-300 rounded text-left"
                 >
                   <PieChartIcon size={16} className="inline mr-2" />
                   Pie Chart
                 </button>
                 <button
-                  onClick={() => addVisualComponent('timeline')}
+                  onClick={() => { addVisualComponent('bar-chart'); setShowVisualMenu(false); }}
                   className="p-3 hover:bg-green-50 border border-gray-300 rounded text-left"
                 >
+                  <BarChart3 size={16} className="inline mr-2" />
+                  Bar Chart
+                </button>
+                <button
+                  onClick={() => { addVisualComponent('timeline'); setShowVisualMenu(false); }}
+                  className="p-3 hover:bg-green-50 border border-gray-300 rounded text-left"
+                >
+                  <Clock size={16} className="inline mr-2" />
                   Timeline
                 </button>
                 <button
-                  onClick={() => addVisualComponent('tech-stack')}
+                  onClick={() => { addVisualComponent('tech-stack'); setShowVisualMenu(false); }}
                   className="p-3 hover:bg-green-50 border border-gray-300 rounded text-left"
                 >
+                  <Code size={16} className="inline mr-2" />
                   Tech Stack
                 </button>
                 <button
-                  onClick={() => addVisualComponent('cost-breakdown')}
+                  onClick={() => { addVisualComponent('cost-breakdown'); setShowVisualMenu(false); }}
                   className="p-3 hover:bg-green-50 border border-gray-300 rounded text-left"
                 >
+                  <DollarSign size={16} className="inline mr-2" />
                   Cost Breakdown
                 </button>
               </div>
@@ -991,6 +1005,16 @@ export const ContractThemeRenderer: React.FC<ContractThemeRendererProps> = ({
                     title={component.title}
                     items={component.data}
                     currency={profile.currency}
+                    editable={editable}
+                    onUpdate={(data) => updateVisualComponent(component.id, data)}
+                  />
+                )}
+                
+                {component.type === 'bar-chart' && (
+                  <BarChart
+                    title={component.title}
+                    items={component.data}
+                    unit=""
                     editable={editable}
                     onUpdate={(data) => updateVisualComponent(component.id, data)}
                   />
