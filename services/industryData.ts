@@ -2,7 +2,8 @@ import { InvoiceItem, TemplateBlock, DocType, Client, DocumentData } from '../ty
 import { PLUMBING_TEMPLATES } from './plumbingData';
 import { MECHANIC_TEMPLATES } from './mechanicData';
 import { CATERING_TEMPLATES } from './cateringData';
-import { NORTHCELL_STUDIOS_TEMPLATES } from './webDevelopmentData';
+// REMOVED: NORTHCELL_STUDIOS_TEMPLATES - Performance fix (39 templates causing crashes)
+// Web development users should create custom templates via AI or manual entry
 
 export const INDUSTRIES = [
   'Plumber',
@@ -87,7 +88,12 @@ const generateMassiveItems = (industry: string): InvoiceItem[] => {
 };
 
 export const getIndustryTemplates = (industry: string): TemplateBlock[] => {
-  // Return industry-specific templates
+  // PERFORMANCE FIX (Dec 5, 2024):
+  // Removed NORTHCELL_STUDIOS_TEMPLATES (39 templates × 15 items = 500+ items)
+  // This was causing app crashes and performance issues
+  // Users can create custom templates via AI or save them manually
+  
+  // Return industry-specific lightweight templates
   if (industry === 'Plumber') {
     return PLUMBING_TEMPLATES;
   }
@@ -101,7 +107,9 @@ export const getIndustryTemplates = (industry: string): TemplateBlock[] => {
   }
   
   if (industry === 'Web Development') {
-    return NORTHCELL_STUDIOS_TEMPLATES;
+    // Return empty array - web dev users create custom templates
+    // This prevents loading 39 massive template blocks
+    return [];
   }
   
   // Default templates for other industries

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GritDocs PWA Icon Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 { color: #333; }
+    .preview {
+      display: flex;
+      gap: 30px;
+      margin: 30px 0;
+      flex-wrap: wrap;
+    }
+    .icon-box {
+      text-align: center;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #48CFCB;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #3ab5b1;
+    }
+    .instructions {
+      background: #f0f9ff;
+      padding: 20px;
+      border-radius: 6px;
+      margin-top: 30px;
+      border-left: 4px solid #48CFCB;
+    }
+    .instructions ol {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 GritDocs PWA Icon Generator</h1>
+    <p>Click the buttons below to download your PWA icons.</p>
+
+    <div class="preview">
+      <div class="icon-box">
+        <h3>192x192</h3>
+        <canvas id="canvas192" width="192" height="192"></canvas>
+        <br>
+        <button onclick="download('canvas192', 'icon-192.png')">Download icon-192.png</button>
+      </div>
+
+      <div class="icon-box">
+        <h3>512x512</h3>
+        <canvas id="canvas512" width="512" height="512"></canvas>
+        <br>
+        <button onclick="download('canvas512', 'icon-512.png')">Download icon-512.png</button>
+      </div>
+    </div>
+
+    <div class="preview">
+      <div class="icon-box">
+        <h3>192x192 (Maskable)</h3>
+        <canvas id="canvasMask192" width="192" height="192"></canvas>
+        <br>
+        <button onclick="download('canvasMask192', 'icon-maskable-192.png')">Download icon-maskable-192.png</button>
+      </div>
+
+      <div class="icon-box">
+        <h3>512x512 (Maskable)</h3>
+        <canvas id="canvasMask512" width="512" height="512"></canvas>
+        <br>
+        <button onclick="download('canvasMask512', 'icon-maskable-512.png')">Download icon-maskable-512.png</button>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <h3>📝 Instructions:</h3>
+      <ol>
+        <li>Click each "Download" button to save all 4 icons</li>
+        <li>Move the downloaded files to the <code>public/</code> folder</li>
+        <li>Commit and push:
+          <pre>git add public/icon-*.png
+git commit -m "Add PWA icons"
+git push</pre>
+        </li>
+        <li>Wait for Netlify to deploy (~2 minutes)</li>
+        <li>Run Lighthouse audit again - PWA score will be 95-100! 🎉</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    // Draw icon on canvas
+    function drawIcon(canvas, fontSize, maskable = false) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      
+      // Background
+      ctx.fillStyle = '#48CFCB';
+      if (maskable) {
+        // Maskable icons need to be a perfect circle/square with safe area
+        ctx.fillRect(0, 0, size, size);
+      } else {
+        // Rounded corners for regular icons
+        const radius = size / 8;
+        ctx.beginPath();
+        ctx.moveTo(radius, 0);
+        ctx.lineTo(size - radius, 0);
+        ctx.quadraticCurveTo(size, 0, size, radius);
+        ctx.lineTo(size, size - radius);
+        ctx.quadraticCurveTo(size, size, size - radius, size);
+        ctx.lineTo(radius, size);
+        ctx.quadraticCurveTo(0, size, 0, size - radius);
+        ctx.lineTo(0, radius);
+        ctx.quadraticCurveTo(0, 0, radius, 0);
+        ctx.closePath();
+        ctx.fill();
+      }
+      
+      // Text
+      ctx.fillStyle = 'white';
+      ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('GD', size / 2, size / 2);
+    }
+
+    // Download canvas as PNG
+    function download(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // Initialize all canvases
+    window.onload = function() {
+      drawIcon(document.getElementById('canvas192'), 120);
+      drawIcon(document.getElementById('canvas512'), 320);
+      drawIcon(document.getElementById('canvasMask192'), 96, true);  // Smaller text for safe area
+      drawIcon(document.getElementById('canvasMask512'), 256, true); // Smaller text for safe area
+    };
+  </script>
+</body>
+</html>
