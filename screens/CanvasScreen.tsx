@@ -3,7 +3,7 @@ import { DocumentData, UserProfile, DocType, TemplateBlock, InvoiceItem, DocStat
 import { Plus, Minus, Save, Share2, X, Grid, Trash2, Box, CheckSquare, Square, DollarSign, GripVertical, Palette, Zap, Aperture, Layout, Feather, Building, Leaf, PenTool, Wind, Download, Mail, Edit3, Eye, Check, Loader, Send } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Input, TextArea } from '../components/Input';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { triggerHaptic } from '../App';
 import { InvoiceThemeRenderer } from '../components/InvoiceThemeRenderer';
 import { ContractThemeRenderer } from '../components/ContractThemeRenderer';
@@ -52,6 +52,7 @@ const CONTRACT_THEMES: { id: ContractTheme; name: string; description: string; e
 
 const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, templates, setTemplates, onSave, itemUsage, onTrackItemUsage, clients, setClients }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const invoiceRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(0.5); 
   const [viewMode, setViewMode] = useState<'Draft' | 'Final'>('Draft');
@@ -89,12 +90,38 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
   };
 
   useEffect(() => {
+    // Handle route state from ChatScreen (for AI-generated contracts/documents)
+    const routeState = location.state as any;
+    if (routeState?.documentId && routeState?.docType && !doc) {
+        // In a real app, you'd fetch the document from database using documentId
+        // For now, we set it up for the user to populate
+        const docTypeEnum = routeState.docType === 'CONTRACT' ? DocType.CONTRACT : DocType.INVOICE;
+        const newDoc: DocumentData = {
+            id: routeState.documentId,
+            type: docTypeEnum,
+            status: 'Draft',
+            title: routeState.title || (docTypeEnum === DocType.CONTRACT ? 'New Contract' : 'New Invoice'),
+            client: { id: 'temp', businessName: 'Client Name', email: '' },
+            date: new Date().toLocaleDateString(),
+            items: routeState.items || [],
+            clauses: routeState.clauses || [],
+            currency: profile.currency || '$',
+            subtotal: 0,
+            taxTotal: 0,
+            total: 0,
+            theme: docTypeEnum === DocType.CONTRACT ? undefined : 'swiss' as any,
+            contractTheme: docTypeEnum === DocType.CONTRACT ? 'legal' : undefined
+        };
+        updateDoc(newDoc);
+        return;
+    }
+
     if (!doc) {
         const blankDoc: DocumentData = {
             id: Date.now().toString(), type: DocType.INVOICE, status: 'Draft', title: 'New Invoice',
             client: { id: 'temp', businessName: 'Client Name', email: '' },
             date: new Date().toLocaleDateString(), items: [], currency: profile.currency || '$',
-            subtotal: 0, taxTotal: 0, total: 0, theme: 'swiss'
+            subtotal: 0, taxTotal: 0, total: 0, theme: 'swiss' as any
         };
         updateDoc(blankDoc);
     } else {
@@ -103,7 +130,7 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
             setSuggestDeposit(true);
         }
     }
-  }, [doc, profile]);
+  }, [doc, profile, location.state]);
 
   const groupedTemplates = useMemo((): Record<string, TemplateBlock[]> => {
       if (!doc) return {};
