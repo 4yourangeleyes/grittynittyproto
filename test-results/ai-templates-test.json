@@ -1,0 +1,457 @@
+{
+  "invoices": {
+    "Plumbing Emergency Repair": {
+      "prompt": "Emergency plumbing repair for burst pipe in kitchen. Client: Sarah Johnson. Includes emergency callout, pipe replacement, and water damage assessment.",
+      "items": [
+        {
+          "description": "Emergency Service Call-Out Fee (Plumbing)",
+          "quantity": 1,
+          "unitType": "ea",
+          "price": 650
+        },
+        {
+          "description": "Plumbing Labour - Burst Pipe Repair & Testing",
+          "quantity": 2.5,
+          "unitType": "hrs",
+          "price": 540
+        },
+        {
+          "description": "PEX Pipe & Fittings (15mm, 3m) for Replacement",
+          "quantity": 1,
+          "unitType": "set",
+          "price": 480
+        },
+        {
+          "description": "Water Damage Assessment & Remediation Consultation",
+          "quantity": 1,
+          "unitType": "ea",
+          "price": 350
+        }
+      ],
+      "totalItems": 4,
+      "totalAmount": 2830
+    },
+    "Website Development Project": {
+      "prompt": "Full website development for small business. Client: Tech Startup Ltd. Includes design, frontend development, backend API, database setup, and 3 months support.",
+      "items": [
+        {
+          "description": "Website Design & User Experience (UX) Consultation",
+          "quantity": 25,
+          "unitType": "hrs",
+          "price": 550
+        },
+        {
+          "description": "Frontend Development (HTML/CSS/JS Implementation)",
+          "quantity": 50,
+          "unitType": "hrs",
+          "price": 550
+        },
+        {
+          "description": "Backend API Development (Node.js/Python/PHP)",
+          "quantity": 40,
+          "unitType": "hrs",
+          "price": 550
+        },
+        {
+          "description": "Database Design & Setup (SQL/NoSQL)",
+          "quantity": 12,
+          "unitType": "hrs",
+          "price": 550
+        },
+        {
+          "description": "Website Hosting & Deployment Configuration",
+          "quantity": 5,
+          "unitType": "hrs",
+          "price": 550
+        },
+        {
+          "description": "Post-Launch Support & Maintenance Package",
+          "quantity": 3,
+          "unitType": "months",
+          "price": 3500
+        }
+      ],
+      "totalItems": 6,
+      "totalAmount": 83100
+    },
+    "Catering Corporate Event": {
+      "prompt": "Corporate lunch catering for 50 people. Client: ABC Corporation. Includes buffet setup, main courses, sides, desserts, beverages, and service staff.",
+      "items": [
+        {
+          "description": "Professional Buffet Setup & Display Equipment Hire",
+          "quantity": 1,
+          "unitType": "set",
+          "price": 2000
+        },
+        {
+          "description": "Assorted Gourmet Main Courses (per person)",
+          "quantity": 50,
+          "unitType": "ea",
+          "price": 150
+        },
+        {
+          "description": "Selection of Fresh Side Dishes (per person)",
+          "quantity": 50,
+          "unitType": "ea",
+          "price": 60
+        },
+        {
+          "description": "Assorted Dessert Selection (per person)",
+          "quantity": 50,
+          "unitType": "ea",
+          "price": 50
+        },
+        {
+          "description": "Premium Beverage Package (soft drinks, water, juice)",
+          "quantity": 50,
+          "unitType": "ea",
+          "price": 40
+        },
+        {
+          "description": "Catering Service Staff (3 staff x 5 hours each)",
+          "quantity": 15,
+          "unitType": "hrs",
+          "price": 450
+        },
+        {
+          "description": "Delivery, Setup & Collection Logistics Fee",
+          "quantity": 1,
+          "unitType": "ea",
+          "price": 650
+        }
+      ],
+      "totalItems": 7,
+      "totalAmount": 24400
+    },
+    "Vehicle Mechanical Service": {
+      "prompt": "Full vehicle service for Toyota Corolla 2018. Client: John Smith. Includes oil change, brake inspection, tire rotation, fluid top-up, and safety check.",
+      "items": [
+        {
+          "description": "Skilled Mechanic Labour - Comprehensive Vehicle Service (4 hours)",
+          "quantity": 4,
+          "unitType": "hrs",
+          "price": 550
+        },
+        {
+          "description": "Premium Synthetic Engine Oil (5W-30) - 4.5 Litres",
+          "quantity": 4.5,
+          "unitType": "L",
+          "price": 150
+        },
+        {
+          "description": "Engine Oil Filter (OEM Quality - Toyota Corolla 2018)",
+          "quantity": 1,
+          "unitType": "ea",
+          "price": 350
+        },
+        {
+          "description": "Engine Air Filter (OEM Quality - Toyota Corolla 2018)",
+          "quantity": 1,
+          "unitType": "ea",
+          "price": 400
+        },
+        {
+          "description": "Essential Fluid Top-Up (Brake, Coolant, Windscreen Washer)",
+          "quantity": 1,
+          "unitType": "set",
+          "price": 300
+        },
+        {
+          "description": "Tyre Rotation and Wheel Balancing (All four wheels)",
+          "quantity": 1,
+          "unitType": "set",
+          "price": 450
+        }
+      ],
+      "totalItems": 6,
+      "totalAmount": 4375
+    },
+    "Electrical Installation": {
+      "prompt": "New electrical circuit installation for home office. Client: Remote Worker. Includes new circuit breaker, wiring, 4 double sockets, and compliance certificate.",
+      "items": [
+        {
+          "description": "Miniature Circuit Breaker (MCB) - 20A, Single Pole",
+          "quantity": 1,
+          "unitType": "ea",
+          "price": 250
+        },
+        {
+          "description": "Electrical Cabling (2.5mm² T&E) & Containment System",
+          "quantity": 1,
+          "unitType": "set",
+          "price": 900
+        },
+        {
+          "description": "Double Switched Wall Socket Outlet (16A) - White",
+          "quantity": 4,
+          "unitType": "ea",
+          "price": 125
+        },
+        {
+          "description": "Electrical Certificate of Compliance (COC) Issuance",
+          "quantity": 1,
+          "unitType": "ea",
+          "price": 1500
+        },
+        {
+          "description": "Skilled Electrician Labour - New Circuit Installation",
+          "quantity": 5.5,
+          "unitType": "hrs",
+          "price": 580
+        }
+      ],
+      "totalItems": 5,
+      "totalAmount": 6340
+    }
+  },
+  "contracts": {
+    "Software Development Agreement": {
+      "prompt": "Software development contract for mobile app project. Client: Startup Inc. Include scope, timeline, payment terms, intellectual property rights, confidentiality, and support terms.",
+      "clauses": [
+        {
+          "title": "Scope of Work",
+          "content": "The Service Provider agrees to undertake the development of a mobile application for Startup Inc. (the 'Client') as detailed in the attached Schedule A ('Project Specifications'). This includes, but is not limited to, design, development, testing, and initial deployment phases. Any changes to the scope of work must be agreed upon in writing by both parties and may result in adjustments to the timeline and project cost."
+        },
+        {
+          "title": "Payment Terms",
+          "content": "The total estimated contract value for the services rendered is R[AMOUNT_ESTIMATED], excluding Value Added Tax (VAT) at the prevailing rate of 15%. A non-refundable deposit of 50% (R[DEPOSIT_AMOUNT]) is due upon the signing of this Agreement. The remaining 50% (R[BALANCE_AMOUNT]) is payable upon successful completion and acceptance of the mobile application by the Client, prior to final deployment. All payments are to be made in South African Rand via Electronic Funds Transfer (EFT) within 7 days of invoice date."
+        },
+        {
+          "title": "Timeline",
+          "content": "The project will commence upon receipt of the initial deposit. A detailed project timeline with specific milestones and deliverables will be provided in Schedule B, attached hereto. The Service Provider will use its best endeavours to adhere to the agreed timeline. Delays caused by the Client (e.g., delayed feedback, provision of content) may result in an adjustment to the project timeline, which will be communicated promptly to the Client."
+        },
+        {
+          "title": "Intellectual Property Rights",
+          "content": "Upon full and final payment of all amounts due under this Agreement, all intellectual property rights, including but not limited to copyright, in the custom-developed mobile application code and associated design elements created specifically for Startup Inc. under this Agreement, shall transfer to the Client. The Service Provider retains ownership of any pre-existing tools, methodologies, frameworks, or generic code libraries used in the development, granting the Client a non-exclusive, perpetual, worldwide license to use such components solely as integrated within the delivered application."
+        },
+        {
+          "title": "Confidentiality",
+          "content": "Both parties agree to treat all information disclosed by the other party, whether orally or in writing, that is designated as confidential or would reasonably be understood to be confidential, as strictly confidential. This includes, but is not limited to, business plans, technical data, trade secrets, and customer information. Neither party shall disclose such confidential information to any third party without the prior written consent of the disclosing party, except as required by law. This obligation shall survive the termination or expiration of this Agreement for a period of five (5) years."
+        },
+        {
+          "title": "Warranty",
+          "content": "The Service Provider warrants that the mobile application developed will substantially conform to the agreed-upon specifications outlined in Schedule A for a period of ninety (90) days from the date of final acceptance ('Warranty Period'). During the Warranty Period, the Service Provider will rectify any material defects or bugs in the application at no additional charge. This warranty does not cover issues arising from misuse, modifications made by the Client or third parties, or problems with third-party software/hardware not supplied by the Service Provider."
+        },
+        {
+          "title": "Liability",
+          "content": "The Service Provider's total liability for any and all claims arising out of or in connection with this Agreement, whether in contract, delict (including negligence), or otherwise, shall not exceed the total fees paid by the Client to the Service Provider under this Agreement. In no event shall the Service Provider be liable for any indirect, incidental, special, or consequential damages, including loss of profits, data, or business interruption, even if advised of the possibility of such damages. This limitation of liability shall apply to the fullest extent permitted by South African law."
+        },
+        {
+          "title": "Support Terms",
+          "content": "Post-warranty support and ongoing maintenance for the mobile application will be subject to a separate written agreement between the Service Provider and the Client. During the Warranty Period, the Service Provider will provide reasonable support for bug fixes as per the Warranty clause. Any new feature development, enhancements, or support beyond the Warranty Period will be quoted and billed separately."
+        },
+        {
+          "title": "Cancellation Policy",
+          "content": "Either party may terminate this Agreement by providing thirty (30) days' written notice to the other party if there is a material breach of this Agreement that remains uncured after fifteen (15) days of written notice specifying the breach. In the event of termination by the Client without cause, or by the Service Provider due to Client's material breach, the Client shall be liable to pay for all services rendered and expenses incurred up to the date of termination, calculated on a pro-rata basis, in addition to any non-refundable deposit. In the event of termination by the Service Provider without cause, or by the Client due to the Service Provider's material breach, the Service Provider shall refund any unearned portion of the fees paid."
+        }
+      ],
+      "totalClauses": 9,
+      "averageClauseLength": 545
+    },
+    "Freelance Consulting Agreement": {
+      "prompt": "Consulting services agreement for business strategy consulting. Client: Growing Business Ltd. Include deliverables, hourly rate, expenses, termination clause, and liability.",
+      "clauses": [
+        {
+          "title": "Scope of Work",
+          "content": "The Service Provider shall provide business strategy consulting services to Growing Business Ltd. This includes, but is not limited to, strategic analysis, market research, workshop facilitation, and the development of actionable recommendations. Specific deliverables will be outlined in a separate Project Plan document, agreed upon by both parties, and may include strategy reports, presentation decks, and implementation roadmaps."
+        },
+        {
+          "title": "Payment Terms",
+          "content": "The Service Provider's standard hourly rate for consulting services is R550.00 (Five Hundred and Fifty Rand) per hour. All invoices will be subject to Value Added Tax (VAT) at the prevailing South African rate of 15%. A non-refundable upfront payment of 30% of the estimated total project fee (to be determined upon detailed scope finalisation) is required upon signing of this Agreement. Subsequent invoices will be issued monthly based on hours worked and agreed-upon milestones. Payment for all invoices is due within 7 (seven) days from the invoice date. Expenses such as travel, accommodation, and specific project materials, if applicable and pre-approved by the Client, will be reimbursed at cost plus an administrative fee of 15%."
+        },
+        {
+          "title": "Timeline",
+          "content": "A detailed project timeline, including key milestones and deliverable dates, will be mutually agreed upon and documented in a separate Project Plan following the commencement of this Agreement. The Service Provider will endeavour to complete all services within the agreed timeframe, subject to the Client's timely provision of necessary information and approvals."
+        },
+        {
+          "title": "Warranty",
+          "content": "The Service Provider warrants that all services will be performed in a professional manner, with due care and skill, and in accordance with generally accepted industry standards and practices. The Service Provider does not warrant any specific outcome or result, as the success of strategic recommendations depends on various factors beyond the Service Provider's control."
+        },
+        {
+          "title": "Liability",
+          "content": "The Service Provider's total liability to the Client for any claim arising out of or in connection with this Agreement, whether in contract, delict (including negligence), or otherwise, shall be limited to the total fees paid by the Client to the Service Provider under this Agreement. The Service Provider shall not be liable for any indirect, special, incidental, consequential, or punitive damages, including but not limited to loss of profits, data, or business opportunity."
+        },
+        {
+          "title": "Termination",
+          "content": "Either party may terminate this Agreement by providing 30 (thirty) calendar days' written notice to the other party. In the event of termination by the Client, the Client shall be liable for all services rendered and expenses incurred up to the effective date of termination. In the event of termination by the Service Provider, the Service Provider shall complete any work in progress that can reasonably be completed within the notice period and shall be paid for all services rendered and expenses incurred up to the effective date of termination. Termination for material breach may occur immediately upon written notice if the breach is not remedied within 7 (seven) days of notification."
+        }
+      ],
+      "totalClauses": 6,
+      "averageClauseLength": 513
+    },
+    "Service Level Agreement": {
+      "prompt": "IT support service level agreement. Client: Corporate Client. Include response times, availability, escalation procedures, performance metrics, and penalties.",
+      "clauses": [
+        {
+          "title": "Parties",
+          "content": "This Service Level Agreement ('SLA') is entered into by and between [Your Company Name], a company duly registered in South Africa (hereinafter referred to as 'Service Provider'), and Corporate Client (hereinafter referred to as 'Client')."
+        },
+        {
+          "title": "Services Provided (Scope of Work)",
+          "content": "The Service Provider agrees to deliver comprehensive IT support services to the Client, including but not limited to: helpdesk support (remote and on-site), network monitoring, hardware and software troubleshooting, system updates and maintenance, security monitoring, and general IT consultation. Specific projects or extensive hardware/software procurements fall outside this SLA and will be quoted and billed separately."
+        },
+        {
+          "title": "Service Period",
+          "content": "This Agreement shall commence on [Start Date] and continue for an initial term of twelve (12) months. Thereafter, it shall automatically renew for successive twelve (12) month periods unless either party provides written notice of non-renewal at least sixty (60) days prior to the end of the then-current term."
+        },
+        {
+          "title": "Service Availability",
+          "content": "The Service Provider's standard support hours are Monday to Friday, 08:00 to 17:00 SAST, excluding South African public holidays. Critical incident support outside these hours may be available upon prior arrangement and may incur additional charges."
+        },
+        {
+          "title": "Response Times",
+          "content": "The Service Provider commits to the following initial response times during standard service hours:\n- Critical Incidents (e.g., system down, major data loss): Within 1 hour\n- High Priority Incidents (e.g., significant user impact, critical application failure): Within 2-4 hours\n- Medium Priority Incidents (e.g., single user issue, non-critical application problem): Within 1 business day\n- Low Priority Requests (e.g., general queries, minor enhancements): Within 2 business days"
+        },
+        {
+          "title": "Escalation Procedures",
+          "content": "All support requests shall be logged via [Designated Ticketing System/Email Address]. If a resolution is not achieved within the target response time, or if the Client deems the issue to be escalating, the following procedure applies:\n1. Initial contact: Tier 1 Support.\n2. If unresolved within specified time: Escalation to Tier 2 Support.\n3. If unresolved by Tier 2 within 4 hours for Critical/High, or 1 business day for Medium: Escalation to Service Delivery Manager."
+        },
+        {
+          "title": "Performance Metrics (Key Performance Indicators)",
+          "content": "The Service Provider shall strive to meet the following KPIs:\n- System Uptime: 99.5% for critical infrastructure managed by Service Provider.\n- Incident Resolution Rate: 90% of High/Medium priority incidents resolved within target times.\n- Customer Satisfaction (CSAT): Average score of 4 out of 5 based on post-resolution surveys.\n- First Call Resolution Rate: 70% for standard user queries."
+        },
+        {
+          "title": "Payment Terms",
+          "content": "The Client shall pay a monthly retainer fee of R25,000.00 (Twenty-Five Thousand Rand) for the services outlined in this SLA. This fee is exclusive of Value Added Tax (VAT), which will be charged at the prevailing South African rate of 15%. Invoices will be issued monthly in advance and are due within seven (7) days of the invoice date. Any on-site call-outs required outside of scheduled maintenance, not covered by the monthly retainer, will be billed at R650.00 per visit, plus R450.00 per hour for labour, excluding VAT."
+        },
+        {
+          "title": "Penalties and Service Credits",
+          "content": "Should the Service Provider fail to meet the specified Critical Incident response times for three (3) or more separate incidents within a calendar month, the Client shall be entitled to a service credit equivalent to 5% of the monthly retainer for that month. Total service credits in any given month shall not exceed 10% of the monthly retainer. Service credits must be claimed in writing within 15 days of the month-end in which the failure occurred."
+        },
+        {
+          "title": "Client Responsibilities",
+          "content": "The Client agrees to:\n- Provide necessary access to systems, facilities, and information.\n- Designate a primary contact person for all IT-related communications.\n- Promptly report all incidents and requests through the agreed channels.\n- Ensure a stable and compliant IT environment as advised by the Service Provider."
+        },
+        {
+          "title": "Confidentiality",
+          "content": "Both parties agree to treat all information disclosed during the term of this Agreement as confidential and shall not disclose it to any third party without prior written consent, except as required by law."
+        },
+        {
+          "title": "Liability",
+          "content": "The Service Provider's total liability for any and all claims arising out of or in connection with this Agreement, whether in contract, delict, or otherwise, shall be limited to the total fees paid by the Client to the Service Provider under this Agreement in the twelve (12) months immediately preceding the event giving rise to the claim. The Service Provider shall not be liable for any indirect, special, or consequential damages, including loss of profits, data, or business interruption, even if advised of the possibility of such damages."
+        },
+        {
+          "title": "Warranty and Service Quality",
+          "content": "The Service Provider warrants that the services will be performed in a professional and workmanlike manner, in accordance with generally accepted industry standards. While the Service Provider will exercise all reasonable care and skill, it does not guarantee uninterrupted service or that all errors, bugs, or defects will be corrected, particularly those inherent in third-party software or hardware."
+        },
+        {
+          "title": "Termination and Cancellation Policy",
+          "content": "Either party may terminate this Agreement by providing sixty (60) days' written notice to the other party. In the event of a material breach of this Agreement by either party, the non-breaching party may terminate this Agreement immediately by providing written notice, provided that the breaching party has failed to cure such breach within thirty (30) days of receiving written notice thereof. Upon termination, all outstanding fees become immediately due and payable."
+        },
+        {
+          "title": "Governing Law",
+          "content": "This Agreement shall be governed by and construed in accordance with the laws of the Republic of South Africa."
+        },
+        {
+          "title": "Dispute Resolution",
+          "content": "Any dispute arising out of or in connection with this Agreement shall first be attempted to be resolved through good faith negotiations between the parties. If negotiations fail, the parties agree to pursue mediation in Johannesburg, South Africa, before resorting to litigation."
+        },
+        {
+          "title": "Entire Agreement",
+          "content": "This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior discussions, negotiations, and agreements, whether written or oral."
+        }
+      ],
+      "totalClauses": 17,
+      "averageClauseLength": 357
+    },
+    "Partnership Agreement": {
+      "prompt": "Business partnership agreement for 60/40 equity split. Partners: Founder A and Investor B. Include capital contribution, profit sharing, decision making, and exit terms.",
+      "clauses": [
+        {
+          "title": "Parties",
+          "content": "This Business Partnership Agreement ('Agreement') is made and entered into by and between Founder A (hereinafter 'Partner A') and Investor B (hereinafter 'Partner B'), collectively referred to as 'the Partners' and individually as 'Partner'."
+        },
+        {
+          "title": "Scope of Work (Nature of Business)",
+          "content": "The Partners hereby agree to form a general partnership for the purpose of conducting a business providing general professional services, including but not limited to consulting, advisory, and project management services within South Africa. The partnership shall operate under a name mutually agreed upon by the Partners and registered in accordance with South African law."
+        },
+        {
+          "title": "Capital Contributions and Equity Split",
+          "content": "The initial capital contributions to the partnership shall be made as mutually agreed upon by the Partners and detailed in a separate schedule or addendum to this Agreement. Upon these contributions, the equity in the partnership shall be held as follows: Partner A holds 60% (sixty percent) equity, and Partner B holds 40% (forty percent) equity."
+        },
+        {
+          "title": "Payment Terms (Profit and Loss Sharing)",
+          "content": "The net profits and losses of the partnership shall be shared between the Partners in proportion to their respective equity holdings, specifically 60% to Partner A and 40% to Partner B. Distributions of profits shall be made as mutually agreed upon by the Partners, after retaining sufficient funds for operational expenses and future growth."
+        },
+        {
+          "title": "Decision Making",
+          "content": "All major business decisions, including but not limited to, significant capital expenditure, changes in the nature of the business, incurring substantial debt, admission of new partners, or dissolution of the partnership, shall require the unanimous written consent of both Partners. Routine operational decisions falling within an agreed budget and scope may be made by the Partner primarily responsible for that operational area. Any deadlock in decision-making shall be resolved through good faith negotiation."
+        },
+        {
+          "title": "Liability",
+          "content": "The Partners shall be jointly and severally liable for all debts, obligations, and liabilities of the partnership incurred in the ordinary course of business, to the full extent of their personal assets, as is customary for a general partnership under South African law. Each Partner agrees to indemnify and hold harmless the other Partner from any liability arising from their own gross negligence, wilful misconduct, or breach of this Agreement."
+        },
+        {
+          "title": "Timeline (Term of Agreement)",
+          "content": "This Agreement shall commence on the date of its signature by both Partners and shall continue indefinitely until terminated by mutual written agreement of the Partners, or as otherwise provided for in the 'Cancellation Policy / Exit Terms' clause of this Agreement."
+        },
+        {
+          "title": "Cancellation Policy / Exit Terms",
+          "content": "A Partner may withdraw from the partnership by providing not less than ninety (90) days' prior written notice to the other Partner. In the event of a Partner's withdrawal, death, permanent incapacity, or material breach of this Agreement, the remaining Partner shall have the first right of refusal to purchase the departing Partner's equity at a fair market value. Fair market value shall be determined by an independent valuator mutually agreed upon by the Partners. Should the remaining Partner not exercise this right, or in the event of mutual agreement to terminate, the partnership shall be dissolved, and its assets liquidated in an orderly manner, with proceeds distributed according to the equity split after settling all liabilities, in accordance with South African law."
+        },
+        {
+          "title": "Confidentiality",
+          "content": "Each Partner undertakes to keep strictly confidential all proprietary information, trade secrets, client lists, business strategies, and financial data of the partnership, both during the term of this Agreement and for a period of five (5) years thereafter. This obligation shall not apply to information that is publicly known, independently developed, or required to be disclosed by law."
+        },
+        {
+          "title": "Governing Law and Dispute Resolution",
+          "content": "This Agreement shall be governed by and construed in accordance with the laws of the Republic of South Africa. Any dispute, controversy, or claim arising out of or relating to this Agreement, including its existence, validity, interpretation, performance, breach, or termination, shall first be attempted to be resolved through good faith negotiation between the Partners. If negotiation fails within thirty (30) days, the dispute shall be submitted to mediation in Johannesburg, South Africa, before resorting to litigation in the appropriate South African courts."
+        },
+        {
+          "title": "Amendments",
+          "content": "No amendment, variation, novation, or waiver of any provision of this Agreement shall be effective unless made in writing and signed by both Partners."
+        }
+      ],
+      "totalClauses": 11,
+      "averageClauseLength": 401
+    },
+    "Maintenance Contract": {
+      "prompt": "Annual maintenance contract for HVAC systems. Client: Office Building. Include monthly inspections, emergency repairs, replacement parts, and warranty terms.",
+      "clauses": [
+        {
+          "title": "1. Parties",
+          "content": "This Service Agreement ('Agreement') is entered into by and between [Your Company Name], a company duly registered in accordance with the laws of the Republic of South Africa (hereinafter referred to as 'Service Provider'), and Office Building (hereinafter referred to as 'Client')."
+        },
+        {
+          "title": "2. Effective Date and Duration",
+          "content": "This Agreement shall commence on [Start Date] ('Effective Date') and shall remain in full force and effect for a period of twelve (12) months, automatically renewing for subsequent twelve-month periods unless terminated earlier in accordance with Clause 6 herein. "
+        },
+        {
+          "title": "3. Scope of Work",
+          "content": "The Service Provider agrees to provide comprehensive annual maintenance services for the Client's HVAC systems located at [Client's Address]. This includes:\n\n3.1. Monthly Scheduled Inspections: Twelve (12) routine inspections per annum, conducted during normal business hours, to assess the operational efficiency, cleanliness, and general condition of all HVAC units. Inspections shall include, but not be limited to, checking filters, coils, refrigerants, electrical connections, thermostats, and control systems.\n3.2. Proactive Maintenance: Identification and reporting of potential issues, wear and tear, and recommendations for preventative measures.\n3.3. Emergency Repairs: Provision for emergency repair services upon request. Labour for emergency repairs will be charged at a preferential hourly rate of R450 per hour, plus a discounted call-out fee of R500 per incident. This rate applies exclusively to contract holders.\n3.4. Replacement Parts: All replacement parts required for repairs will be sourced and supplied by the Service Provider and billed separately at cost plus a twenty percent (20%) markup.\n3.5. Annual Service Report: A comprehensive report detailing all services rendered, system status, and future recommendations will be provided at the end of each contract year."
+        },
+        {
+          "title": "4. Payment Terms",
+          "content": "4.1. Annual Contract Value: The total annual contract value for the routine monthly inspection and proactive maintenance services outlined in Clause 3.1 and 3.2 is R22,000 (Twenty-Two Thousand Rand), excluding Value Added Tax (VAT).\n4.2. Payment Schedule: A non-refundable deposit of 25% (R5,500) of the annual contract value is due and payable upon the signing of this Agreement. The remaining balance of R16,500 shall be paid in eleven (11) equal monthly instalments of R1,500, with the first instalment due one month after the Effective Date and subsequent instalments due on the same day of each succeeding month.\n4.3. Additional Charges: Charges for emergency repair labour, call-out fees, and replacement parts (as per Clause 3.3 and 3.4) will be invoiced separately on a monthly basis and are due within seven (7) days of invoice date.\n4.4. VAT: All prices quoted are exclusive of VAT, which will be added at the prevailing rate of 15% where applicable.\n4.5. Late Payments: Any payments not received by the due date shall incur interest at a rate of 2% per month or part thereof, compounded monthly, until fully paid. The Client shall also be liable for any legal costs incurred by the Service Provider in recovering outstanding amounts."
+        },
+        {
+          "title": "5. Warranty",
+          "content": "5.1. Workmanship: The Service Provider warrants all repair workmanship for a period of six (6) months from the date of completion of the specific repair.\n5.2. Materials and Parts: All new replacement parts supplied by the Service Provider are covered by the original manufacturer's warranty, the terms of which will be passed on to the Client.\n5.3. Exclusions: This warranty does not cover damage resulting from misuse, neglect, unauthorised alterations, acts of God, or failure to adhere to the Service Provider’s recommendations."
+        },
+        {
+          "title": "6. Cancellation Policy",
+          "content": "6.1. Notice Period: Either party may terminate this Agreement by providing not less than sixty (60) days' written notice to the other party.\n6.2. Early Termination Fees: In the event of termination by the Client before the completion of the 12-month contract period, the Client shall be liable for an early termination fee equivalent to three (3) months of the outstanding routine maintenance fees, in addition to any other outstanding amounts for services rendered and parts supplied up to the termination date. No refund will be provided for the initial deposit.\n6.3. Termination for Cause: Either party may terminate this Agreement immediately upon written notice if the other party commits a material breach of this Agreement and fails to remedy such breach within thirty (30) days of receiving written notice thereof."
+        },
+        {
+          "title": "7. Liability",
+          "content": "7.1. Limitation of Liability: The Service Provider shall not be liable for any indirect, incidental, special, or consequential damages, including but not limited to loss of profits, data, or business interruption, arising out of or in connection with this Agreement. The Service Provider's total aggregate liability under this Agreement shall not exceed the total fees paid by the Client to the Service Provider in the twelve (12) months preceding the event giving rise to the claim.\n7.2. Professional Indemnity: The Service Provider maintains appropriate professional indemnity and public liability insurance to cover its obligations under this Agreement."
+        },
+        {
+          "title": "8. Confidentiality",
+          "content": "Both parties agree to treat all information disclosed during the course of this Agreement as confidential and shall not disclose such information to any third party without the prior written consent of the other party, except as required by law."
+        },
+        {
+          "title": "9. Force Majeure",
+          "content": "Neither party shall be liable for any failure or delay in performing its obligations under this Agreement where such failure or delay results from any cause beyond the reasonable control of that party, including but not limited to acts of God, war, civil unrest, fire, flood, or government regulations."
+        },
+        {
+          "title": "10. Governing Law and Dispute Resolution",
+          "content": "This Agreement shall be governed by and construed in accordance with the laws of the Republic of South Africa. Any dispute arising out of or in connection with this Agreement, which cannot be resolved amicably, shall first be referred to mediation. If mediation fails, the dispute shall be submitted to arbitration in accordance with the rules of the Arbitration Foundation of Southern Africa (AFSA)."
+        }
+      ],
+      "totalClauses": 10,
+      "averageClauseLength": 604
+    }
+  },
+  "timestamp": "2025-12-04T15:28:00.467Z"
+}

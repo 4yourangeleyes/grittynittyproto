@@ -1,10 +1,8 @@
 // Supabase Edge Function: generate-document
 // Deploy with: supabase functions deploy generate-document
-// This function securely calls Google GenAI using your API key stored as a Supabase secret
+// This function securely calls Google Gemini REST API using your API key stored as a Supabase secret
 // @ts-ignore - This is a Deno Edge Function, not Node.js/Browser code
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-// @ts-ignore - Deno/npm imports
-import { GoogleGenAI, Type, Schema } from "npm:@google/genai@^1.30.0"
 
 // Types
 interface GenerateDocumentRequest {
@@ -69,39 +67,6 @@ function validateRequest(body: unknown): GenerateDocumentRequest {
   return data as GenerateDocumentRequest
 }
 
-// Schema for structured output
-const documentSchema: Schema = {
-  type: Type.OBJECT,
-  properties: {
-    title: { type: Type.STRING, description: "Title of the document" },
-    items: {
-      type: Type.ARRAY,
-      description: "List of items for an invoice",
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          description: { type: Type.STRING },
-          quantity: { type: Type.NUMBER },
-          unitType: { type: Type.STRING, description: "Unit of measure: 'hrs', 'ea', 'm', 'days', 'ft', 'sqm'" },
-          price: { type: Type.NUMBER }
-        }
-      }
-    },
-    clauses: {
-      type: Type.ARRAY,
-      description: "List of clauses for a contract",
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          title: { type: Type.STRING },
-          content: { type: Type.STRING }
-        }
-      }
-    },
-    bodyText: { type: Type.STRING, description: "General body text for HR docs" }
-  }
-}
-
 // Industry-specific context helper
 function getIndustryContext(industry: string): string {
   const contexts: Record<string, string> = {
@@ -154,17 +119,65 @@ serve(async (req: Request) => {
 
   try {
     // Parse and validate request
+    console.log('[AI Service] Incoming request, method:', req.method)
     const body = await req.json()
+    console.log('[AI Service] Request body keys:', Object.keys(body))
     
     // 0. Health Check (Ping)
     if (body.ping) {
+      console.log('[AI Service] Health check ping received')
       return new Response(
         JSON.stringify({ status: 'ok', message: 'AI service is online' }),
         { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
       )
     }
+    
+    // 1. Debug Check (shows if API key is set)
+    if (body.debug) {
+      // @ts-ignore - Deno global
+      const hasGENAI = !!Deno.env.get('GENAI_API_KEY')
+      // @ts-ignore - Deno global
+      const hasGeniAi = !!Deno.env.get('geni_ai_api')
+      // @ts-ignore - Deno global
+      const allEnvVars = Object.keys(Deno.env.toObject())
+      
+      console.log('[AI Service] Debug check - GENAI_API_KEY:', hasGENAI)
+      console.log('[AI Service] Debug check - geni_ai_api:', hasGeniAi)
+      
+      return new Response(
+        JSON.stringify({ 
+          status: 'debug',
+          has_GENAI_API_KEY: hasGENAI,
+          has_geni_ai_api: hasGeniAi,
+          env_var_count: allEnvVars.length
+        }),
+        { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+      )
+    }
+    
+    // 2. List Models (check what's available)
+    if (body.listModels) {
+      // @ts-ignore - Deno global
+      const apiKey = Deno.env.get('GENAI_API_KEY') || Deno.env.get('geni_ai_api')
+      if (!apiKey) {
+        return new Response(
+          JSON.stringify({ error: 'No API key set' }),
+          { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+        )
+      }
+      
+      const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
+      const listResponse = await fetch(listUrl)
+      const listData = await listResponse.json()
+      
+      return new Response(
+        JSON.stringify(listData),
+        { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+      )
+    }
 
     const request = validateRequest(body)
+    console.log('[AI Service] Request validated successfully')
 
     // Rate limit check (basic: 10 requests per minute per IP)
     const clientIp = req.headers.get('x-forwarded-for') || 'unknown'
@@ -172,16 +185,35 @@ serve(async (req: Request) => {
     // In production, use Deno.redis or similar for rate limiting
     // For now, we'll rely on Supabase's built-in rate limiting
 
-    // Get API key from environment
+    // Get API key from environment (trying multiple possible names)
     // @ts-ignore - Deno global
-    const apiKey = Deno.env.get('GENAI_API_KEY')
+    let apiKey = Deno.env.get('GENAI_API_KEY') || Deno.env.get('geni_ai_api')
+    
+    console.log('[AI Service] Checking for API key...')
+    // @ts-ignore - Deno global
+    console.log('[AI Service] GENAI_API_KEY exists:', !!Deno.env.get('GENAI_API_KEY'))
+    // @ts-ignore - Deno global
+    console.log('[AI Service] geni_ai_api exists:', !!Deno.env.get('geni_ai_api'))
+    
     if (!apiKey) {
-      throw new Error('GENAI_API_KEY not configured on server')
+      console.error('[AI Service] No API key found in environment variables')
+      throw new Error('API key not configured. Please set GENAI_API_KEY or geni_ai_api in Supabase Edge Function secrets')
     }
+    
+    console.log('[AI Service] API key found, length:', apiKey.length)
 
     // Build system prompt with industry-specific context
     const industryContext = getIndustryContext(request.industry || 'General')
     const pricingGuidance = getPricingGuidance(request.industry || 'General')
+    
+    console.log('[AI Service] Building prompt for:', {
+      docType: request.docType,
+      industry: request.industry,
+      clientName: request.clientName,
+      businessName: request.businessName,
+      hasTemplateContext: !!request.templateContext,
+      hasConversationHistory: !!(request.conversationHistory && request.conversationHistory.length > 0)
+    })
     
     const systemInstruction = `
 You are an expert South African business document generator for "${request.businessName}".
@@ -270,38 +302,79 @@ Build upon this conversation. If user says "add more", "change price", "make it 
 ` : ''}
     `.trim()
 
-    // Initialize Google GenAI
-    const ai = new GoogleGenAI({ apiKey })
-    const modelName = 'gemini-2.0-flash-exp'
+    // Initialize Google GenAI via REST API
+    console.log('[AI Service] Calling Gemini REST API...')
+    // Use stable Gemini 2.5 Flash model
+    const model = 'gemini-2.5-flash'
+    console.log('[AI Service] Using model:', model)
 
-    // Call Gemini API
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: request.prompt,
-      config: {
-        systemInstruction: systemInstruction,
-        responseMimeType: "application/json",
-        responseSchema: documentSchema
-      }
+    const fullPrompt = systemInstruction + '\n\nUSER REQUEST:\n' + request.prompt
+
+    // Call Gemini REST API (v1beta for JSON mode support)
+    console.log('[AI Service] Sending request to Gemini...')
+    console.log('[AI Service] Prompt length:', fullPrompt.length, 'chars')
+    
+    const startTime = Date.now()
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
+    
+    const geminiResponse = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: fullPrompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 8192,
+          responseMimeType: "application/json"
+        }
+      })
     })
+    
+    const endTime = Date.now()
+    console.log('[AI Service] Response received in', endTime - startTime, 'ms')
+    console.log('[AI Service] Response status:', geminiResponse.status)
 
-    const responseText = response.text || "{}"
+    if (!geminiResponse.ok) {
+      const errorText = await geminiResponse.text()
+      console.error('[AI Service] Gemini API error:', errorText)
+      throw new Error(`Gemini API error: ${geminiResponse.status} - ${errorText}`)
+    }
+
+    const geminiData = await geminiResponse.json()
+    const responseText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "{}"
+    console.log('[AI Service] Response length:', responseText.length, 'characters')
     
     // Parse and validate response
-    let result: GenerateDocumentResponse
+    let parsedResult: GenerateDocumentResponse
     try {
-      result = JSON.parse(responseText)
+      parsedResult = JSON.parse(responseText)
+      console.log('[AI Service] Successfully parsed JSON response')
+      
+      if (request.docType === 'INVOICE' && parsedResult.items) {
+        console.log('[AI Service] Generated', parsedResult.items.length, 'invoice items')
+      } else if (request.docType === 'CONTRACT' && parsedResult.clauses) {
+        console.log('[AI Service] Generated', parsedResult.clauses.length, 'contract clauses')
+      }
     } catch (parseError) {
-      console.error('Failed to parse AI response:', responseText)
+      console.error('[AI Service] Failed to parse AI response:', responseText)
+      console.error('[AI Service] Parse error:', parseError)
       return new Response(
-        JSON.stringify({ error: 'Invalid response from AI model' }),
+        JSON.stringify({ error: 'Invalid response from AI model', details: String(parseError) }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       )
     }
 
     // Basic sanitization: ensure numbers are valid
-    if (result.items) {
-      result.items = result.items.map(item => ({
+    if (parsedResult.items) {
+      parsedResult.items = parsedResult.items.map((item: DocumentItem) => ({
         description: (item.description || '').substring(0, 500),
         quantity: Math.max(0, Number(item.quantity) || 1),
         unitType: (item.unitType || 'ea').substring(0, 20),
@@ -309,8 +382,9 @@ Build upon this conversation. If user says "add more", "change price", "make it 
       }))
     }
 
+    console.log('[AI Service] Returning successful response')
     return new Response(
-      JSON.stringify(result),
+      JSON.stringify(parsedResult),
       {
         status: 200,
         headers: {
@@ -321,13 +395,23 @@ Build upon this conversation. If user says "add more", "change price", "make it 
     )
 
   } catch (error) {
-    console.error('Error:', error)
+    console.error('[AI Service] ERROR occurred:', error)
+    console.error('[AI Service] Error type:', error?.constructor?.name)
+    console.error('[AI Service] Error message:', error instanceof Error ? error.message : 'Unknown')
     
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    if (error instanceof Error && error.stack) {
+      console.error('[AI Service] Stack trace:', error.stack)
+    }
+    
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
     const status = errorMessage.includes('rate limit') ? 429 : 500
 
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ 
+        error: errorMessage,
+        timestamp: new Date().toISOString(),
+        service: 'generate-document'
+      }),
       {
         status,
         headers: {

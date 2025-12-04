@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Website Development</title>
+  <style>
+    @page { margin: 2cm; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #2563eb;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      color: #1e40af;
+      margin: 0 0 10px 0;
+      font-size: 32px;
+    }
+    .header .subtitle {
+      color: #64748b;
+      font-size: 14px;
+      font-weight: normal;
+    }
+    .meta-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    .meta-section h3 {
+      color: #1e40af;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0 0 10px 0;
+    }
+    .meta-section p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    thead {
+      background: #1e40af;
+      color: white;
+    }
+    th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .totals {
+      margin-top: 30px;
+      text-align: right;
+    }
+    .totals-table {
+      margin-left: auto;
+      width: 300px;
+      border-top: 2px solid #cbd5e1;
+    }
+    .totals-table td {
+      padding: 8px 12px;
+      border: none;
+    }
+    .total-row {
+      font-weight: bold;
+      font-size: 18px;
+      background: #1e40af;
+      color: white;
+    }
+    .footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 2px solid #e2e8f0;
+      text-align: center;
+      color: #64748b;
+      font-size: 12px;
+    }
+    .badge {
+      display: inline-block;
+      background: #22c55e;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>INVOICE</h1>
+    <div class="subtitle">Website Development Project - Tech Startup Ltd</div>
+    <div class="badge">✨ AI-Generated Template</div>
+  </div>
+
+  <div class="meta-info">
+    <div class="meta-section">
+      <h3>From</h3>
+      <p><strong>Digital Solutions Agency</strong></p>
+      <p>Web Development Services</p>
+      <p>Date: 4 December 2025</p>
+    </div>
+    <div class="meta-section">
+      <h3>Bill To</h3>
+      <p><strong>Tech Startup Ltd</strong></p>
+      <p>Invoice #: INV-432480</p>
+      <p>Due: 2026/01/03</p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 50%;">Description</th>
+        <th style="width: 12%;">Qty</th>
+        <th style="width: 13%;">Unit</th>
+        <th style="width: 25%; text-align: right;">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        <tr>
+          <td>Website Design & User Experience (UI/UX) Phase</td>
+          <td>1</td>
+          <td>set</td>
+          <td class="text-right">R25000.00</td>
+        </tr>
+      
+        <tr>
+          <td>Frontend Development (Interactive User Interface)</td>
+          <td>1</td>
+          <td>set</td>
+          <td class="text-right">R55000.00</td>
+        </tr>
+      
+        <tr>
+          <td>Backend API Development (Core Functionality)</td>
+          <td>1</td>
+          <td>set</td>
+          <td class="text-right">R48000.00</td>
+        </tr>
+      
+        <tr>
+          <td>Database Architecture & Setup</td>
+          <td>1</td>
+          <td>ea</td>
+          <td class="text-right">R14000.00</td>
+        </tr>
+      
+        <tr>
+          <td>Project Management & Quality Assurance Labour</td>
+          <td>30</td>
+          <td>hrs</td>
+          <td class="text-right">R16500.00</td>
+        </tr>
+      
+        <tr>
+          <td>Post-Launch Support & Maintenance Package</td>
+          <td>3</td>
+          <td>months</td>
+          <td class="text-right">R12000.00</td>
+        </tr>
+      
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <table class="totals-table">
+      <tr>
+        <td>Subtotal:</td>
+        <td class="text-right">R170500.00</td>
+      </tr>
+      <tr>
+        <td>VAT (15%):</td>
+        <td class="text-right">R25575.00</td>
+      </tr>
+      <tr class="total-row">
+        <td>TOTAL:</td>
+        <td class="text-right">R196075.00</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="footer">
+    <p><strong>Scenario:</strong> Full website development for small business. Client: Tech Startup Ltd. Includes design, frontend development, backend API, database setup, and 3 months support.</p>
+    <p>Generated using AI-powered template system • Document Creator Pro</p>
+    <p>This is a demonstration of AI-generated invoice templates with South African pricing</p>
+  </div>
+</body>
+</html>

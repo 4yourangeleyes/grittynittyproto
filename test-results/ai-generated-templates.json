@@ -1,0 +1,783 @@
+[
+  {
+    "id": "template-1764862653010",
+    "name": "Emergency Plumbing Call-out",
+    "category": "Plumber",
+    "type": "Invoice",
+    "items": [
+      {
+        "id": "item-1764862653010-0",
+        "description": "Emergency Call-out Fee",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 650,
+        "templateBlockName": "Emergency Plumbing Call-out"
+      },
+      {
+        "id": "item-1764862653010-1",
+        "description": "Pipe Replacement Material (assorted fittings & up to 3m pipe)",
+        "quantity": 1,
+        "unitType": "set",
+        "price": 1150,
+        "templateBlockName": "Emergency Plumbing Call-out"
+      },
+      {
+        "id": "item-1764862653010-2",
+        "description": "Skilled Plumber Labour (Burst Pipe Repair - 3 hours)",
+        "quantity": 3,
+        "unitType": "hrs",
+        "price": 550,
+        "templateBlockName": "Emergency Plumbing Call-out"
+      },
+      {
+        "id": "item-1764862653010-3",
+        "description": "Water Damage Assessment & Initial Report",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 550,
+        "templateBlockName": "Emergency Plumbing Call-out"
+      }
+    ]
+  },
+  {
+    "id": "template-1764862661544",
+    "name": "Website Development Package",
+    "category": "Web Development",
+    "type": "Invoice",
+    "items": [
+      {
+        "id": "item-1764862661544-0",
+        "description": "Custom UI/UX Design & Wireframing",
+        "quantity": 1,
+        "unitType": "set",
+        "price": 18500,
+        "templateBlockName": "Website Development Package"
+      },
+      {
+        "id": "item-1764862661544-1",
+        "description": "Responsive Frontend Development (HTML5, CSS3, JavaScript)",
+        "quantity": 1,
+        "unitType": "set",
+        "price": 35000,
+        "templateBlockName": "Website Development Package"
+      },
+      {
+        "id": "item-1764862661544-2",
+        "description": "Robust Backend API Development (e.g., Node.js/Python)",
+        "quantity": 1,
+        "unitType": "set",
+        "price": 32000,
+        "templateBlockName": "Website Development Package"
+      },
+      {
+        "id": "item-1764862661544-3",
+        "description": "Database Design & Implementation (SQL/NoSQL)",
+        "quantity": 1,
+        "unitType": "set",
+        "price": 11500,
+        "templateBlockName": "Website Development Package"
+      },
+      {
+        "id": "item-1764862661544-4",
+        "description": "Cloud Hosting Setup & Configuration (e.g., AWS/Azure/DigitalOcean)",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 3800,
+        "templateBlockName": "Website Development Package"
+      },
+      {
+        "id": "item-1764862661544-5",
+        "description": "Post-Launch Technical Support & Maintenance",
+        "quantity": 3,
+        "unitType": "months",
+        "price": 4500,
+        "templateBlockName": "Website Development Package"
+      },
+      {
+        "id": "item-1764862661544-6",
+        "description": "Project Management & Client Coordination",
+        "quantity": 1,
+        "unitType": "set",
+        "price": 7500,
+        "templateBlockName": "Website Development Package"
+      }
+    ]
+  },
+  {
+    "id": "template-1764862669138",
+    "name": "Corporate Event Catering",
+    "category": "Catering",
+    "type": "Invoice",
+    "items": [
+      {
+        "id": "item-1764862669138-0",
+        "description": "Executive Buffet Package (Main Courses, Sides & Desserts)",
+        "quantity": 50,
+        "unitType": "ea",
+        "price": 350,
+        "templateBlockName": "Corporate Event Catering"
+      },
+      {
+        "id": "item-1764862669138-1",
+        "description": "Standard Beverage Package (Assorted Juices, Soft Drinks, Mineral Water)",
+        "quantity": 50,
+        "unitType": "ea",
+        "price": 80,
+        "templateBlockName": "Corporate Event Catering"
+      },
+      {
+        "id": "item-1764862669138-2",
+        "description": "Event Service Staff (3 staff x 5 hours)",
+        "quantity": 15,
+        "unitType": "hrs",
+        "price": 380,
+        "templateBlockName": "Corporate Event Catering"
+      },
+      {
+        "id": "item-1764862669138-3",
+        "description": "Buffet Chafing Dishes & Serving Utensils Hire (3 sets)",
+        "quantity": 3,
+        "unitType": "set",
+        "price": 80,
+        "templateBlockName": "Corporate Event Catering"
+      },
+      {
+        "id": "item-1764862669138-4",
+        "description": "Event Setup & Teardown Labour (2 staff x 2 hours)",
+        "quantity": 4,
+        "unitType": "hrs",
+        "price": 380,
+        "templateBlockName": "Corporate Event Catering"
+      }
+    ]
+  },
+  {
+    "id": "template-1764862742344",
+    "name": "Vehicle Full Service",
+    "category": "Mechanic",
+    "type": "Invoice",
+    "items": [
+      {
+        "id": "item-1764862742344-0",
+        "description": "Skilled Mechanic Labour for Full Vehicle Service (includes Brake Inspection, Tyre Rotation, Fluid Level Checks, Multi-Point Safety Inspection)",
+        "quantity": 3,
+        "unitType": "hrs",
+        "price": 600,
+        "templateBlockName": "Vehicle Full Service"
+      },
+      {
+        "id": "item-1764862742344-1",
+        "description": "Premium Synthetic Engine Oil (5L - 5W-30)",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 480,
+        "templateBlockName": "Vehicle Full Service"
+      },
+      {
+        "id": "item-1764862742344-2",
+        "description": "OEM Equivalent Oil Filter",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 170,
+        "templateBlockName": "Vehicle Full Service"
+      }
+    ]
+  },
+  {
+    "id": "template-1764862750931",
+    "name": "Home Office Electrical",
+    "category": "Electrician",
+    "type": "Invoice",
+    "items": [
+      {
+        "id": "item-1764862750931-0",
+        "description": "Site Call-out and Initial Assessment (Electrician)",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 600,
+        "templateBlockName": "Home Office Electrical"
+      },
+      {
+        "id": "item-1764862750931-1",
+        "description": "Supply & Installation: Dedicated 20A Miniature Circuit Breaker (MCB)",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 480,
+        "templateBlockName": "Home Office Electrical"
+      },
+      {
+        "id": "item-1764862750931-2",
+        "description": "Supply & Installation: 2.5mm² Surfix Cable for New Circuit",
+        "quantity": 25,
+        "unitType": "m",
+        "price": 85,
+        "templateBlockName": "Home Office Electrical"
+      },
+      {
+        "id": "item-1764862750931-3",
+        "description": "Supply & Installation: Standard Double Wall Sockets (White)",
+        "quantity": 4,
+        "unitType": "ea",
+        "price": 280,
+        "templateBlockName": "Home Office Electrical"
+      },
+      {
+        "id": "item-1764862750931-4",
+        "description": "Skilled Electrician Labour for Circuit Installation & Testing",
+        "quantity": 7,
+        "unitType": "hrs",
+        "price": 550,
+        "templateBlockName": "Home Office Electrical"
+      },
+      {
+        "id": "item-1764862750931-5",
+        "description": "Issuance of Electrical Certificate of Compliance (CoC)",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 850,
+        "templateBlockName": "Home Office Electrical"
+      }
+    ]
+  },
+  {
+    "id": "template-1764862761993",
+    "name": "Bathroom Renovation",
+    "category": "Plumber",
+    "type": "Invoice",
+    "items": [
+      {
+        "id": "item-1764862761993-0",
+        "description": "Removal of existing toilet system and disposal",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 1200,
+        "templateBlockName": "Bathroom Renovation"
+      },
+      {
+        "id": "item-1764862761993-1",
+        "description": "Installation of new wall-hung toilet system (incl. concealed cistern)",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 3500,
+        "templateBlockName": "Bathroom Renovation"
+      },
+      {
+        "id": "item-1764862761993-2",
+        "description": "Removal and disposal of existing basin unit",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 650,
+        "templateBlockName": "Bathroom Renovation"
+      },
+      {
+        "id": "item-1764862761993-3",
+        "description": "Installation of new basin unit (vanity/pedestal type)",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 1800,
+        "templateBlockName": "Bathroom Renovation"
+      },
+      {
+        "id": "item-1764862761993-4",
+        "description": "Waterproofing application (wet areas - 10 sqm)",
+        "quantity": 10,
+        "unitType": "sqm",
+        "price": 250,
+        "templateBlockName": "Bathroom Renovation"
+      },
+      {
+        "id": "item-1764862761993-5",
+        "description": "Waterproofing materials (membrane, primer, sealants)",
+        "quantity": 1,
+        "unitType": "set",
+        "price": 1200,
+        "templateBlockName": "Bathroom Renovation"
+      },
+      {
+        "id": "item-1764862761993-6",
+        "description": "Floor and wall tiling service (15 sqm)",
+        "quantity": 15,
+        "unitType": "sqm",
+        "price": 320,
+        "templateBlockName": "Bathroom Renovation"
+      },
+      {
+        "id": "item-1764862761993-7",
+        "description": "Tiling materials (adhesive, grout, spacers, trim)",
+        "quantity": 1,
+        "unitType": "set",
+        "price": 1500,
+        "templateBlockName": "Bathroom Renovation"
+      },
+      {
+        "id": "item-1764862761993-8",
+        "description": "Skilled Plumber Labour (Connections, testing & final adjustments - 8 hours)",
+        "quantity": 8,
+        "unitType": "hrs",
+        "price": 550,
+        "templateBlockName": "Bathroom Renovation"
+      },
+      {
+        "id": "item-1764862761993-9",
+        "description": "Site Call-out & Initial Assessment Fee",
+        "quantity": 1,
+        "unitType": "ea",
+        "price": 600,
+        "templateBlockName": "Bathroom Renovation"
+      }
+    ]
+  },
+  {
+    "id": "template-1764862772995",
+    "name": "Software Development Agreement",
+    "category": "Software Development",
+    "type": "Contract",
+    "clauses": [
+      {
+        "id": "clause-1764862772995-0",
+        "title": "Scope of Work",
+        "content": "Your Business (the \"Service Provider\") agrees to design, develop, test, and deploy a custom mobile application for Sample Client (the \"Client\") as per the mutually agreed-upon functional specifications document (FSD) and user interface (UI) designs attached as Schedule A. This includes front-end and back-end development, database integration, API development (if required), and basic quality assurance testing. Specific features and functionalities will be detailed in Schedule A.",
+        "order": 1,
+        "required": true,
+        "category": "Software Development"
+      },
+      {
+        "id": "clause-1764862772995-1",
+        "title": "Payment Terms",
+        "content": "The total contract value for the mobile application development is estimated at R309,100.00 (South African Rand), inclusive of all labour, estimated materials/software licenses, and VAT at 15%. A non-refundable deposit of 50% (R154,550.00) is due upon the signing of this Agreement. The remaining 50% (R154,550.00) will be due upon successful completion and acceptance of the mobile application by the Client, prior to final deployment. All payments are to be made via Electronic Funds Transfer (EFT) within seven (7) days of invoice receipt. Overdue payments may incur interest at 2% per month.",
+        "order": 2,
+        "required": true,
+        "category": "Software Development"
+      },
+      {
+        "id": "clause-1764862772995-2",
+        "title": "Timeline",
+        "content": "The Service Provider commits to completing the mobile application development within an estimated period of 14-16 weeks from the date of receipt of the deposit and all necessary client assets/information. This timeline is subject to prompt feedback and provision of required materials from the Client and may be adjusted in writing by mutual agreement due to scope changes or unforeseen delays.",
+        "order": 3,
+        "required": false,
+        "category": "Software Development"
+      },
+      {
+        "id": "clause-1764862772995-3",
+        "title": "Warranty and Support",
+        "content": "Your Business warrants that the developed mobile application will function substantially in accordance with the approved specifications for a period of three (3) months from the date of final acceptance and deployment. During this warranty period, Your Business will rectify any bugs or errors in the code at no additional cost, provided such errors are not caused by third-party software, client modifications, or external environmental factors. This warranty does not cover new feature development or changes to existing functionality. Post-warranty support and maintenance will be available under a separate agreement.",
+        "order": 4,
+        "required": false,
+        "category": "Software Development"
+      },
+      {
+        "id": "clause-1764862772995-4",
+        "title": "Intellectual Property Rights",
+        "content": "Upon full and final payment of all amounts due under this Agreement, all intellectual property rights, including but not limited to copyrights, patents, and trade secrets pertaining to the custom-developed mobile application code, design, and associated documentation, shall transfer from Your Business to Sample Client. Your Business retains the right to use general programming techniques, ideas, and algorithms developed during the project for other clients, provided such use does not infringe on the Client's specific intellectual property or confidential information.",
+        "order": 5,
+        "required": false,
+        "category": "Software Development"
+      },
+      {
+        "id": "clause-1764862772995-5",
+        "title": "Confidentiality",
+        "content": "Both parties agree to treat all non-public information, including but not limited to business plans, technical specifications, client data, and proprietary information, disclosed during the term of this Agreement as strictly confidential. Neither party shall disclose such confidential information to any third party without the prior written consent of the other party, except as required by law. This obligation of confidentiality shall survive the termination of this Agreement for a period of five (5) years.",
+        "order": 6,
+        "required": false,
+        "category": "Software Development"
+      },
+      {
+        "id": "clause-1764862772995-6",
+        "title": "Limitation of Liability",
+        "content": "To the maximum extent permitted by South African law, Your Business's total liability for any and all claims arising out of or in connection with this Agreement, whether in contract, delict (including negligence), or otherwise, shall not exceed the total fees paid by the Client to Your Business under this Agreement. Your Business shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or business interruption, even if advised of the possibility of such damages.",
+        "order": 7,
+        "required": false,
+        "category": "Software Development"
+      },
+      {
+        "id": "clause-1764862772995-7",
+        "title": "Cancellation Policy",
+        "content": "In the event of cancellation by the Client before completion, the Client shall forfeit the initial 50% deposit. Additionally, the Client shall be liable for payment for all work completed and expenses incurred by Your Business up to the date of cancellation, calculated on a pro-rata basis at Your Business's standard hourly rates, less the deposit already paid. In the event of cancellation by Your Business due to unforeseen circumstances or client breach, Your Business will refund any unspent portion of the deposit and payment for work not yet performed.",
+        "order": 8,
+        "required": false,
+        "category": "Software Development"
+      },
+      {
+        "id": "clause-1764862772995-8",
+        "title": "Governing Law and Jurisdiction",
+        "content": "This Agreement shall be governed by and construed in accordance with the laws of the Republic of South Africa. Any dispute arising out of or in connection with this Agreement, including any question regarding its existence, validity, or termination, shall be referred to and finally resolved by the courts of South Africa.",
+        "order": 9,
+        "required": false,
+        "category": "Software Development"
+      }
+    ],
+    "contractType": "Project Contract"
+  },
+  {
+    "id": "template-1764862788725",
+    "name": "Monthly Retainer Agreement",
+    "category": "Consulting",
+    "type": "Contract",
+    "clauses": [
+      {
+        "id": "clause-1764862788725-0",
+        "title": "Parties",
+        "content": "This Agreement is made and entered into between Your Business (a company incorporated under the laws of South Africa, hereinafter referred to as 'the Service Provider'), and Sample Client (hereinafter referred to as 'the Client').",
+        "order": 1,
+        "required": false,
+        "category": "Consulting"
+      },
+      {
+        "id": "clause-1764862788725-1",
+        "title": "Scope of Work",
+        "content": "The Service Provider shall provide professional business consulting services to the Client for a maximum of twenty (20) hours per calendar month. These services include, but are not limited to, strategic advice, operational guidance, and general business development support, as mutually agreed upon from time to time. Unused hours within a given month shall not roll over to subsequent months.",
+        "order": 2,
+        "required": true,
+        "category": "Consulting"
+      },
+      {
+        "id": "clause-1764862788725-2",
+        "title": "Term and Termination",
+        "content": "This Agreement shall commence on [Start Date] and shall continue on a month-to-month basis until terminated by either party. Either party may terminate this Agreement by providing the other party with a minimum of thirty (30) calendar days' written notice. Upon termination, any unused hours for the current month will be forfeited, and the Client remains liable for all fees incurred up to the effective termination date.",
+        "order": 3,
+        "required": false,
+        "category": "Consulting"
+      },
+      {
+        "id": "clause-1764862788725-3",
+        "title": "Payment Terms",
+        "content": "The Client shall pay the Service Provider a monthly retainer fee of R13,000.00 (Thirteen Thousand Rand) excluding Value-Added Tax (VAT). VAT will be charged at the prevailing South African rate of 15%, amounting to R1,950.00 per month. The total monthly fee, inclusive of VAT, is R14,950.00 (Fourteen Thousand Nine Hundred and Fifty Rand). The first month's retainer is due upon the signing of this Agreement. Subsequent monthly payments are due in advance on the 1st day of each month. Invoices will be issued accordingly. Payments shall be made via Electronic Funds Transfer (EFT) to the Service Provider's nominated bank account.",
+        "order": 4,
+        "required": true,
+        "category": "Consulting"
+      },
+      {
+        "id": "clause-1764862788725-4",
+        "title": "Additional Services and Expenses",
+        "content": "Any services requested by the Client exceeding the agreed twenty (20) hours per month will be billed separately at an hourly rate of R650.00, subject to prior written agreement between both parties. All approved out-of-pocket expenses (e.g., travel, specific research materials) incurred by the Service Provider on behalf of the Client will be billed at cost plus a 15% administration fee, and require prior written approval from the Client.",
+        "order": 5,
+        "required": false,
+        "category": "Consulting"
+      },
+      {
+        "id": "clause-1764862788725-5",
+        "title": "Confidentiality",
+        "content": "Both parties agree to keep all confidential information, including but not limited to business strategies, financial data, client lists, and operational details, strictly confidential during and after the term of this Agreement. This obligation does not apply to information that is publicly available or required to be disclosed by law.",
+        "order": 6,
+        "required": false,
+        "category": "Consulting"
+      },
+      {
+        "id": "clause-1764862788725-6",
+        "title": "Intellectual Property",
+        "content": "All intellectual property rights in any work product, reports, or materials specifically created by the Service Provider for the Client under this Agreement shall vest in the Client upon full payment of the relevant fees. The Service Provider retains the right to use general knowledge, experience, and techniques gained during the engagement.",
+        "order": 7,
+        "required": false,
+        "category": "Consulting"
+      },
+      {
+        "id": "clause-1764862788725-7",
+        "title": "Warranty and Professional Standards",
+        "content": "The Service Provider warrants that all services will be performed in a professional manner, utilizing reasonable care, skill, and diligence, in accordance with generally accepted industry standards. The Service Provider does not warrant specific outcomes or results, as these are dependent on various factors beyond its control.",
+        "order": 8,
+        "required": false,
+        "category": "Consulting"
+      },
+      {
+        "id": "clause-1764862788725-8",
+        "title": "Limitation of Liability",
+        "content": "The Service Provider's total liability for any claim arising out of or in connection with this Agreement, whether in contract, delict (including negligence), or otherwise, shall be limited to the total fees paid by the Client to the Service Provider under this Agreement in the preceding three (3) months. The Service Provider shall not be liable for any indirect, consequential, special, or punitive damages.",
+        "order": 9,
+        "required": false,
+        "category": "Consulting"
+      },
+      {
+        "id": "clause-1764862788725-9",
+        "title": "Governing Law",
+        "content": "This Agreement shall be governed by and construed in accordance with the laws of the Republic of South Africa.",
+        "order": 10,
+        "required": false,
+        "category": "Consulting"
+      },
+      {
+        "id": "clause-1764862788725-10",
+        "title": "Dispute Resolution",
+        "content": "Any dispute arising out of or in connection with this Agreement shall first be addressed through good faith negotiations between senior representatives of both parties. If the dispute cannot be resolved within fourteen (14) days, either party may refer the dispute to mediation in Johannesburg, South Africa, under the rules of an agreed mediation body.",
+        "order": 11,
+        "required": false,
+        "category": "Consulting"
+      }
+    ],
+    "contractType": "Retainer Agreement"
+  },
+  {
+    "id": "template-1764862804499",
+    "name": "Website Maintenance SLA",
+    "category": "Web Development",
+    "type": "Contract",
+    "clauses": [
+      {
+        "id": "clause-1764862804499-0",
+        "title": "Scope of Work",
+        "content": "Your Business (the “Service Provider”) agrees to provide comprehensive website maintenance services for the website(s) owned by Sample Client (the “Client”). These services include, but are not limited to, the following:\n\n1.  **Monthly Updates**: Regular content, theme, and plugin updates to ensure optimal functionality and compatibility.\n2.  **Security Patches**: Prompt application of critical security patches and updates to protect against vulnerabilities.\n3.  **Proactive Monitoring**: Continuous monitoring of website performance and availability.\n4.  **Regular Backups**: Implementation of automated, scheduled website backups (files and database) to ensure data recovery capabilities.\n5.  **Technical Support**: General technical support related to the maintenance services provided.",
+        "order": 1,
+        "required": true,
+        "category": "Web Development"
+      },
+      {
+        "id": "clause-1764862804499-1",
+        "title": "Service Level Agreement (SLA)",
+        "content": "The Service Provider commits to the following service levels:\n\n1.  **Response Time**: A guaranteed response time of twenty-four (24) hours for all critical support requests initiated by the Client during standard business hours.\n2.  **Uptime Guarantee**: A 99% (ninety-nine percent) uptime guarantee for the Client's website(s), measured monthly, excluding scheduled maintenance, force majeure events, or issues originating from third-party hosting providers not managed by the Service Provider.\n3.  **Backup Retention**: Backups will be retained for a minimum period of 30 days, allowing for restoration to previous states if required.",
+        "order": 2,
+        "required": false,
+        "category": "Web Development"
+      },
+      {
+        "id": "clause-1764862804499-2",
+        "title": "Payment Terms",
+        "content": "The Client agrees to pay a monthly recurring fee of R1850.00 (One Thousand Eight Hundred and Fifty Rand), exclusive of Value Added Tax (VAT). VAT at the prevailing South African rate (currently 15%) will be added to all invoices, making the total monthly fee R2127.50 (Two Thousand One Hundred and Twenty-Seven Rand and Fifty Cents) inclusive of VAT. Invoices will be issued on the 1st day of each month and are due within seven (7) days of the invoice date. Payment methods accepted include Electronic Funds Transfer (EFT). Late payments may incur interest at a rate of 2% per month on the outstanding balance.",
+        "order": 3,
+        "required": true,
+        "category": "Web Development"
+      },
+      {
+        "id": "clause-1764862804499-3",
+        "title": "Contract Term and Termination",
+        "content": "This Agreement shall commence on the date of signing and shall continue on a month-to-month basis thereafter, unless terminated earlier as per the terms herein. Either party may terminate this Agreement by providing thirty (30) days' written notice to the other party. In the event of a material breach of this Agreement by either party, the non-breaching party may terminate this Agreement immediately upon written notice, provided the breaching party fails to remedy the breach within fourteen (14) days of receiving such notice.",
+        "order": 4,
+        "required": false,
+        "category": "Web Development"
+      },
+      {
+        "id": "clause-1764862804499-4",
+        "title": "Warranty",
+        "content": "The Service Provider warrants that all services will be performed in a professional and workmanlike manner, in accordance with generally accepted industry standards. This warranty does not cover issues arising from client-induced changes, third-party software or plugins not managed by the Service Provider, or events beyond the reasonable control of the Service Provider.",
+        "order": 5,
+        "required": true,
+        "category": "Web Development"
+      },
+      {
+        "id": "clause-1764862804499-5",
+        "title": "Limitation of Liability",
+        "content": "The Service Provider shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with this Agreement, including but not limited to loss of profits, data, or business interruption, even if advised of the possibility of such damages. The Service Provider's total aggregate liability under this Agreement shall not exceed the total fees paid by the Client to the Service Provider in the three (3) months immediately preceding the event giving rise to the claim.",
+        "order": 6,
+        "required": false,
+        "category": "Web Development"
+      },
+      {
+        "id": "clause-1764862804499-6",
+        "title": "Confidentiality",
+        "content": "Both parties agree to maintain strict confidentiality regarding all proprietary and confidential information disclosed during the term of this Agreement, including but not limited to business practices, client data, and technical specifications. This obligation of confidentiality shall survive the termination of this Agreement.",
+        "order": 7,
+        "required": false,
+        "category": "Web Development"
+      },
+      {
+        "id": "clause-1764862804499-7",
+        "title": "Governing Law",
+        "content": "This Agreement shall be governed by and construed in accordance with the laws of the Republic of South Africa. Any disputes arising hereunder shall be subject to the exclusive jurisdiction of the appropriate courts in South Africa.",
+        "order": 8,
+        "required": false,
+        "category": "Web Development"
+      }
+    ],
+    "contractType": "Maintenance Agreement"
+  },
+  {
+    "id": "template-1764862818813",
+    "name": "Partnership Equity Agreement",
+    "category": "Business Partnership",
+    "type": "Contract",
+    "clauses": [
+      {
+        "id": "clause-1764862818813-0",
+        "title": "Business Purpose",
+        "content": "The partners hereby agree to carry on the business of providing general professional services under the name 'Your Business' (hereinafter referred to as 'the Partnership'). The primary objective of the Partnership is to offer high-quality professional services to clients within South Africa and beyond, as may be mutually agreed upon.",
+        "order": 1,
+        "required": false,
+        "category": "Business Partnership"
+      },
+      {
+        "id": "clause-1764862818813-1",
+        "title": "Capital Contributions and Equity Split",
+        "content": "The partners shall contribute capital to the Partnership in proportion to their equity split. Partner A shall hold sixty percent (60%) equity in the Partnership, and Partner B shall hold forty percent (40%) equity. The initial capital contributions shall be formally recorded and agreed upon by both partners in writing, reflecting this 60/40 split. Further capital contributions, if required for the operation or expansion of the Partnership, shall be agreed upon by both partners and provided in proportion to their respective equity holdings, unless otherwise mutually agreed in writing.",
+        "order": 2,
+        "required": false,
+        "category": "Business Partnership"
+      },
+      {
+        "id": "clause-1764862818813-2",
+        "title": "Profit and Loss Sharing",
+        "content": "Net profits and losses of the Partnership shall be shared between the partners in proportion to their equity holdings: Partner A (60%) and Partner B (40%). Distributions of profits shall be made as agreed upon by the partners, typically on a quarterly or annual basis, after due consideration of the Partnership's financial health, operational needs, and any reserves deemed necessary for future growth or contingencies.",
+        "order": 3,
+        "required": false,
+        "category": "Business Partnership"
+      },
+      {
+        "id": "clause-1764862818813-3",
+        "title": "Management and Decision-Making Authority",
+        "content": "Decisions concerning the ordinary course of business of the Partnership shall require the agreement of partners representing a simple majority (over 50%) of the equity. Major decisions, including but not limited to, changes to the Partnership's nature of business, significant capital expenditure exceeding R50,000, admitting new partners, or selling the business, shall require the unanimous written consent of all partners. Partner A, holding 60% equity, shall have the controlling vote in ordinary business decisions where consensus cannot be reached, provided such decisions are within the agreed business scope and do not materially prejudice the interests of Partner B.",
+        "order": 4,
+        "required": false,
+        "category": "Business Partnership"
+      },
+      {
+        "id": "clause-1764862818813-4",
+        "title": "Term of Agreement",
+        "content": "This Partnership Agreement shall commence on the date of its signing and shall continue indefinitely until terminated in accordance with the provisions of this Agreement.",
+        "order": 5,
+        "required": false,
+        "category": "Business Partnership"
+      },
+      {
+        "id": "clause-1764862818813-5",
+        "title": "Withdrawal and Exit Terms",
+        "content": "Any partner desiring to withdraw from the Partnership must provide not less than three (3) months' written notice to the other partner. The withdrawing partner's interest shall be purchased by the remaining partner or the Partnership at a fair market value, determined by an independent valuator agreed upon by all parties. The terms of payment for such buy-out shall be negotiated in good faith between the parties.",
+        "order": 6,
+        "required": false,
+        "category": "Business Partnership"
+      },
+      {
+        "id": "clause-1764862818813-6",
+        "title": "Dispute Resolution",
+        "content": "Any dispute or difference arising out of or in connection with this Agreement, including any question regarding its existence, validity, or termination, shall first be referred to mediation in accordance with the rules of the Arbitration Foundation of Southern Africa (AFSA). If the dispute is not resolved through mediation within thirty (30) days, it shall be referred to and finally resolved by arbitration under the auspices of AFSA.",
+        "order": 7,
+        "required": false,
+        "category": "Business Partnership"
+      },
+      {
+        "id": "clause-1764862818813-7",
+        "title": "Liability of Partners",
+        "content": "The partners shall be jointly and severally liable for all debts and obligations of the Partnership. Each partner shall indemnify the other partner against any liability incurred by the Partnership due to their own gross negligence or willful misconduct.",
+        "order": 8,
+        "required": false,
+        "category": "Business Partnership"
+      },
+      {
+        "id": "clause-1764862818813-8",
+        "title": "Termination of Partnership",
+        "content": "This Partnership may be terminated by mutual written agreement of all partners, by operation of law, or in the event of a material breach of this Agreement by a partner that is not remedied within thirty (30) days of written notice. Upon termination, the Partnership's assets shall be liquidated, and liabilities settled, with any remaining surplus distributed according to the profit-sharing ratios.",
+        "order": 9,
+        "required": false,
+        "category": "Business Partnership"
+      },
+      {
+        "id": "clause-1764862818813-9",
+        "title": "Governing Law",
+        "content": "This Agreement shall be governed by and construed in accordance with the laws of the Republic of South Africa.",
+        "order": 10,
+        "required": false,
+        "category": "Business Partnership"
+      }
+    ],
+    "contractType": "Partnership Agreement"
+  },
+  {
+    "id": "template-1764862833777",
+    "name": "Freelance Service Agreement",
+    "category": "Freelance",
+    "type": "Contract",
+    "clauses": [
+      {
+        "id": "clause-1764862833777-0",
+        "title": "Parties",
+        "content": "This Service Agreement ('Agreement') is made and entered into between:\n\n'Your Business' (Service Provider)\n[Your Business Address]\n[Your Business Contact Details]\n\nAND\n\nSample Client (Client)\n[Client Address]\n[Client Contact Details]\n\n(Hereinafter collectively referred to as 'the Parties').",
+        "order": 1,
+        "required": false,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-1",
+        "title": "Scope of Work",
+        "content": "The Service Provider agrees to provide freelance professional services to the Client, specifically encompassing the deliverables outlined in Annexure A (attached hereto) or as mutually agreed upon in writing. These services include, but are not limited to, [SPECIFIC DELIVERABLES/PROJECT DESCRIPTION]. All work will be performed with professional diligence and in accordance with generally accepted industry standards.",
+        "order": 2,
+        "required": true,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-2",
+        "title": "Payment Terms",
+        "content": "The Client agrees to compensate the Service Provider for the services rendered. The total agreed fee for the project is R[TOTAL AGREED FEE, e.g., calculated based on R350-650 per hour for skilled labour and 15-25% markup on materials].\n\nPayment Schedule: Payment of 100% of the total agreed fee is due upon successful completion and acceptance of all agreed deliverables, within [e.g., 7-14] days from the date of invoice.\n\nExpenses Reimbursement: The Client shall reimburse the Service Provider for all reasonable and pre-approved out-of-pocket expenses incurred directly in the provision of the services, including but not limited to travel, accommodation, and materials. Such expenses must be supported by valid receipts and will be invoiced separately, with an administrative fee of 15-25% applied to materials as per industry standard. Call-out fees of R450-750 may apply if the service requires on-site presence.\n\nValue Added Tax (VAT): All fees and charges are exclusive of Value Added Tax (VAT), which will be added at the prevailing South African rate (currently 15%) where applicable and clearly indicated on all invoices.",
+        "order": 3,
+        "required": true,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-3",
+        "title": "Timeline",
+        "content": "The Service Provider will endeavour to complete the services and deliver the agreed deliverables by [START DATE] to [END DATE], or as otherwise stipulated in Annexure A or subsequent written agreements. Any changes to the timeline must be mutually agreed upon in writing between the Parties.",
+        "order": 4,
+        "required": false,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-4",
+        "title": "Warranty",
+        "content": "The Service Provider warrants that the services will be performed in a professional manner, using reasonable care and skill, and in accordance with generally accepted industry standards. This warranty is valid for a period of [e.g., 30 days] from the date of completion of the services. This warranty does not cover issues arising from client-provided materials, changes requested by the Client after completion, or misuse.",
+        "order": 5,
+        "required": true,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-5",
+        "title": "Liability Limitation",
+        "content": "To the maximum extent permitted by South African law, the Service Provider's total liability for any claim arising out of or in connection with this Agreement, whether in contract, delict (including negligence), or otherwise, shall be limited to the total fees paid by the Client to the Service Provider under this Agreement for the services giving rise to the claim. The Service Provider shall not be liable for any indirect, incidental, consequential, special, or punitive damages, including but not limited to loss of profits, data, or business opportunity.",
+        "order": 6,
+        "required": false,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-6",
+        "title": "Termination",
+        "content": "Either party may terminate this Agreement by providing [e.g., 30] days' written notice to the other party.\n\nTermination for Cause: Either party may terminate this Agreement immediately upon written notice if the other party commits a material breach of this Agreement and fails to remedy such breach within [e.g., 14] days of receiving written notice thereof.\n\nConsequences of Termination: Upon termination, the Client shall pay the Service Provider for all services rendered and pre-approved expenses incurred up to the effective date of termination. Any deliverables completed and paid for shall remain the property of the Client. The Service Provider will return any Client property in its possession.",
+        "order": 7,
+        "required": false,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-7",
+        "title": "Confidentiality",
+        "content": "Both parties agree to keep confidential all non-public information received from the other party during the course of this Agreement, including but not limited to business plans, client lists, and project details. This obligation shall survive the termination of this Agreement.",
+        "order": 8,
+        "required": false,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-8",
+        "title": "Intellectual Property",
+        "content": "Unless otherwise agreed in writing, all intellectual property rights in the deliverables specifically created for the Client under this Agreement shall vest in the Client upon full payment of all fees due. The Service Provider retains the right to use the work for portfolio and promotional purposes, unless specifically restricted by a separate non-disclosure agreement.",
+        "order": 9,
+        "required": false,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-9",
+        "title": "Governing Law",
+        "content": "This Agreement shall be governed by and construed in accordance with the laws of the Republic of South Africa.",
+        "order": 10,
+        "required": false,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-10",
+        "title": "Dispute Resolution",
+        "content": "Any dispute arising out of or in connection with this Agreement shall first be attempted to be resolved through good faith negotiations between the parties. If unresolved, the dispute may be referred to mediation or, failing that, to a court of competent jurisdiction in South Africa.",
+        "order": 11,
+        "required": false,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-11",
+        "title": "Entire Agreement",
+        "content": "This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior discussions, negotiations, and agreements, whether oral or written.",
+        "order": 12,
+        "required": false,
+        "category": "Freelance"
+      },
+      {
+        "id": "clause-1764862833777-12",
+        "title": "Signatures",
+        "content": "This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument. Electronic signatures shall be considered valid and binding.\n\n_____________________________\nFor 'Your Business' (Service Provider)\nDate: [Date]\n\n_____________________________\nFor Sample Client (Client)\nDate: [Date]",
+        "order": 13,
+        "required": false,
+        "category": "Freelance"
+      }
+    ],
+    "contractType": "Service Agreement"
+  }
+]

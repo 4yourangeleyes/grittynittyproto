@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Development Invoice</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f3f4f6;
+      padding: 40px 20px;
+    }
+    .page-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .header .subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .content {
+      padding: 40px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .meta-section h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #6b7280;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .meta-section p {
+      font-size: 14px;
+      color: #1f2937;
+      margin: 6px 0;
+      line-height: 1.5;
+    }
+    .meta-section strong {
+      font-weight: 600;
+      color: #111827;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 30px 0;
+    }
+    thead {
+      background: #f9fafb;
+      border-top: 2px solid #e5e7eb;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    th {
+      text-align: left;
+      padding: 14px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      color: #6b7280;
+    }
+    td {
+      padding: 16px 12px;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 14px;
+      color: #374151;
+    }
+    tbody tr:hover {
+      background: #fafafa;
+    }
+    .text-right { text-align: right; }
+    .totals {
+      margin-top: 40px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .totals-box {
+      width: 350px;
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 24px;
+      border: 1px solid #e5e7eb;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      font-size: 14px;
+    }
+    .total-row.final {
+      margin-top: 12px;
+      padding-top: 16px;
+      border-top: 2px solid #d1d5db;
+      font-size: 20px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .footer {
+      background: #f9fafb;
+      padding: 30px 40px;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .footer strong {
+      color: #374151;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="header">
+      <h1>INVOICE</h1>
+      <div class="subtitle">Website Development Project - Tech Startup Ltd</div>
+      <div class="badge">✨ AI-Generated • Swiss Theme</div>
+    </div>
+
+    <div class="content">
+      <div class="meta-grid">
+        <div class="meta-section">
+          <h3>From</h3>
+          <p><strong>Digital Solutions</strong></p>
+          <p>Web Development</p>
+          <p>Date: 2025/12/04</p>
+        </div>
+        <div class="meta-section">
+          <h3>Bill To</h3>
+          <p><strong>Tech Startup Ltd</strong></p>
+          <p>Invoice #: 62956339</p>
+          <p>Due: 2026/01/03</p>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 10%;">QTY</th>
+            <th style="width: 10%;">UNIT</th>
+            <th style="width: 55%;">DESCRIPTION</th>
+            <th style="width: 25%; text-align: right;">AMOUNT</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="text-right">8</td>
+              <td>hrs</td>
+              <td>Initial Web Design & User Experience (UX) Consultation</td>
+              <td class="text-right"><strong>R4400.00</strong></td>
+            </tr>
+          
+            <tr>
+              <td class="text-right">80</td>
+              <td>hrs</td>
+              <td>Custom Frontend Development (HTML5, CSS3, JavaScript Framework)</td>
+              <td class="text-right"><strong>R48000.00</strong></td>
+            </tr>
+          
+            <tr>
+              <td class="text-right">70</td>
+              <td>hrs</td>
+              <td>Custom Backend API Development (RESTful Services)</td>
+              <td class="text-right"><strong>R42000.00</strong></td>
+            </tr>
+          
+            <tr>
+              <td class="text-right">15</td>
+              <td>hrs</td>
+              <td>Database Design & Setup (e.g., PostgreSQL/MySQL)</td>
+              <td class="text-right"><strong>R8700.00</strong></td>
+            </tr>
+          
+            <tr>
+              <td class="text-right">1</td>
+              <td>ea</td>
+              <td>Premium Cloud Hosting Service (Annual Subscription)</td>
+              <td class="text-right"><strong>R3600.00</strong></td>
+            </tr>
+          
+            <tr>
+              <td class="text-right">3</td>
+              <td>months</td>
+              <td>Post-Launch Technical Support & Maintenance (Monthly Retainer)</td>
+              <td class="text-right"><strong>R7500.00</strong></td>
+            </tr>
+          
+        </tbody>
+      </table>
+
+      <div class="totals">
+        <div class="totals-box">
+          <div class="total-row">
+            <span>Subtotal</span>
+            <strong>R114200.00</strong>
+          </div>
+          <div class="total-row">
+            <span>VAT (15%)</span>
+            <strong>R17130.00</strong>
+          </div>
+          <div class="total-row final">
+            <span>TOTAL</span>
+            <span>R131330.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p><strong>AI-Generated Template Block</strong></p>
+      <p>Scenario: Complete website development: design consultation, frontend development, backend API, database setup, hosting, 3 months support</p>
+      <p>Created using your app's Swiss theme styling with Gemini AI • Ready to use in Document Creator</p>
+      <p style="margin-top: 12px; font-size: 11px; color: #9ca3af;">This template can be saved and reused for similar projects</p>
+    </div>
+  </div>
+</body>
+</html>
