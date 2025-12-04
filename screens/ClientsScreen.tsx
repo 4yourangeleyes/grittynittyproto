@@ -19,6 +19,8 @@ const ClientsScreen: React.FC<ClientsScreenProps> = ({ clients, documents, saveC
   const [newClientPhone, setNewClientPhone] = useState('');
   const [newClientReg, setNewClientReg] = useState('');
   const [newClientAddress, setNewClientAddress] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const clientsPerPage = 50;
 
   const handleAddClient = async () => {
     if (!newClientName || !newClientEmail) {
@@ -53,6 +55,17 @@ const ClientsScreen: React.FC<ClientsScreenProps> = ({ clients, documents, saveC
     c.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredClients.length / clientsPerPage);
+  const startIndex = (currentPage - 1) * clientsPerPage;
+  const endIndex = startIndex + clientsPerPage;
+  const paginatedClients = filteredClients.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const getClientDocs = (clientId: string) => {
       return documents.filter(d => d.client.id === clientId || d.client.businessName === clients.find(c => c.id === clientId)?.businessName).slice(0, 3);
@@ -134,7 +147,7 @@ const ClientsScreen: React.FC<ClientsScreenProps> = ({ clients, documents, saveC
             </div>
         ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredClients.map(client => {
+                {paginatedClients.map(client => {
                     const clientDocs = getClientDocs(client.id);
                     return (
                         <div key={client.id} className="bg-white border-2 border-grit-dark shadow-grit p-6 hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
@@ -198,6 +211,46 @@ const ClientsScreen: React.FC<ClientsScreenProps> = ({ clients, documents, saveC
                         </div>
                     );
                 })}
+            </div>
+        )}
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+            <div className="mt-8 flex justify-between items-center">
+                <div className="text-gray-600 font-medium">
+                    Showing {startIndex + 1}-{Math.min(endIndex, filteredClients.length)} of {filteredClients.length} clients
+                </div>
+                <div className="flex gap-2">
+                    <Button 
+                        variant="outline"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} 
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </Button>
+                    <div className="flex gap-1">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                            <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`px-3 py-2 border-2 font-bold transition-all ${
+                                    currentPage === page 
+                                        ? 'bg-grit-dark text-white border-grit-dark' 
+                                        : 'bg-white text-gray-700 border-grit-dark hover:bg-gray-100'
+                                }`}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                    </div>
+                    <Button 
+                        variant="outline"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} 
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </Button>
+                </div>
             </div>
         )}
     </div>

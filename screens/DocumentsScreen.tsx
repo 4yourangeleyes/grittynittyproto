@@ -16,6 +16,8 @@ const DocumentsScreen: React.FC<DocumentsScreenProps> = ({ documents, openDocume
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<DocType | 'ALL'>('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
+  const documentsPerPage = 25;
   
   // We need access to deleteDocument from the hook, but props only passed documents array.
   // Ideally, we should pass deleteDocument as a prop from App.tsx, but for now we can re-instantiate the hook 
@@ -38,6 +40,17 @@ const DocumentsScreen: React.FC<DocumentsScreenProps> = ({ documents, openDocume
       const matchesType = filterType === 'ALL' || doc.type === filterType;
       return matchesSearch && matchesType;
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredDocs.length / documentsPerPage);
+  const startIndex = (currentPage - 1) * documentsPerPage;
+  const endIndex = startIndex + documentsPerPage;
+  const paginatedDocs = filteredDocs.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search/filter changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType]);
 
   const handleOpen = (doc: DocumentData) => {
       openDocument(doc);
@@ -103,8 +116,8 @@ const DocumentsScreen: React.FC<DocumentsScreenProps> = ({ documents, openDocume
                     </tr>
                 </thead>
                 <tbody className="divide-y-2 divide-gray-100">
-                    {filteredDocs.length > 0 ? (
-                        filteredDocs.map(doc => (
+                    {paginatedDocs.length > 0 ? (
+                        paginatedDocs.map(doc => (
                             <tr key={doc.id} onClick={() => handleOpen(doc)} className="hover:bg-gray-50 cursor-pointer group transition-colors">
                                 <td className="p-4">
                                     <span className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded ${
@@ -154,6 +167,51 @@ const DocumentsScreen: React.FC<DocumentsScreenProps> = ({ documents, openDocume
                 </tbody>
             </table>
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+            <div className="mt-6 flex justify-between items-center">
+                <div className="text-gray-600 font-medium">
+                    Showing {startIndex + 1}-{Math.min(endIndex, filteredDocs.length)} of {filteredDocs.length} documents
+                </div>
+                <div className="flex gap-2">
+                    <Button
+                        variant="outline"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2"
+                    >
+                        Previous
+                    </Button>
+                    
+                    {/* Page numbers */}
+                    <div className="flex gap-1">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                            <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`px-3 py-2 font-bold transition-colors ${
+                                    currentPage === page
+                                        ? 'bg-grit-dark text-white'
+                                        : 'bg-white border-2 border-gray-300 hover:border-grit-dark'
+                                }`}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                    </div>
+                    
+                    <Button
+                        variant="outline"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2"
+                    >
+                        Next
+                    </Button>
+                </div>
+            </div>
+        )}
     </div>
   );
 };
