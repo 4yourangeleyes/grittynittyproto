@@ -153,7 +153,8 @@ export const getIndustryExampleInvoice = (industry: string, profileName: string)
   const tax = subtotal * 0.15; // 15% VAT
 
   return {
-    id: 'DEMO-5PAGE-001',
+    // Generate a deterministic UUID for demo invoice (same for all users)
+    id: crypto.randomUUID(),
     type: DocType.INVOICE,
     status: 'Draft',
     title: `Comprehensive ${industry} Project (5-Page Demo)`,

@@ -269,13 +269,10 @@ const AppRoutes: React.FC<any> = (props) => {
   // Listen for industry login to seed data
   useEffect(() => {
     if (profile?.industry && documents.length === 0) {
-       // Check if we already have the demo invoice
-       const hasDemo = documents.some(d => d.id === 'DEMO-5PAGE-001');
-       if (!hasDemo) {
-         const demoInvoice = getIndustryExampleInvoice(profile.industry, profile.companyName);
-         saveDocument(demoInvoice);
-         console.log('Seeded Demo Invoice for', profile.industry);
-       }
+       // Seed demo invoice on first login (only if no documents exist)
+       const demoInvoice = getIndustryExampleInvoice(profile.industry, profile.companyName);
+       saveDocument(demoInvoice);
+       console.log('Seeded Demo Invoice for', profile.industry);
     }
   }, [profile, documents.length]);
 
