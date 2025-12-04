@@ -353,11 +353,17 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
 
       if (result.success) {
         triggerHaptic('success');
+        
+        // Set link expiration to 30 days from now
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + 30);
+        
         const updated = { 
           ...doc, 
           status: 'Sent' as DocStatus, 
           contractId: selectedContractId || undefined,
-          shareableLink: `${window.location.origin}#/view/${doc.id}`
+          shareableLink: `${window.location.origin}#/view/${doc.id}`,
+          shareLinkExpiresAt: expiryDate.toISOString()
         };
         updateDoc(updated);
         onSave(updated);

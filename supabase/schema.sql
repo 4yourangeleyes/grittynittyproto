@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS public.clients (
 -- Indexes for filtering and searching
 CREATE INDEX idx_clients_user_id ON public.clients(user_id);
 CREATE INDEX idx_clients_business_name ON public.clients(business_name);
+-- Performance index for search
+CREATE INDEX idx_clients_user_name ON public.clients(user_id, business_name);
 
 -- ============================================================================
 -- 3. TEMPLATES TABLE (Reusable invoice/contract line item blocks)
@@ -70,6 +72,8 @@ CREATE TABLE IF NOT EXISTS public.templates (
 CREATE INDEX idx_templates_user_id ON public.templates(user_id);
 CREATE INDEX idx_templates_doc_type ON public.templates(doc_type);
 CREATE INDEX idx_templates_category ON public.templates(category);
+-- Performance index for template queries
+CREATE INDEX idx_templates_user_category ON public.templates(user_id, category);
 
 -- ============================================================================
 -- 4. TEMPLATE ITEMS TABLE (individual line items within a template)
@@ -118,6 +122,10 @@ CREATE INDEX idx_documents_client_id ON public.documents(client_id);
 CREATE INDEX idx_documents_status ON public.documents(status);
 CREATE INDEX idx_documents_created_at ON public.documents(created_at DESC);
 CREATE INDEX idx_documents_deleted_at ON public.documents(deleted_at);
+-- Performance indexes for common queries
+CREATE INDEX idx_documents_user_date ON public.documents(user_id, date_issued DESC) WHERE deleted_at IS NULL;
+CREATE INDEX idx_documents_user_type ON public.documents(user_id, doc_type) WHERE deleted_at IS NULL;
+CREATE INDEX idx_documents_user_status ON public.documents(user_id, status) WHERE deleted_at IS NULL;
 
 -- ============================================================================
 -- 6. INVOICE ITEMS TABLE (Line items within a document)
@@ -426,3 +434,33 @@ COMMENT ON TABLE public.analytics_events IS 'User activity analytics';
 COMMENT ON TABLE public.item_usage IS 'Track frequently used items for suggestions';
 COMMENT ON COLUMN public.documents.deleted_at IS 'Soft delete timestamp';
 COMMENT ON COLUMN public.invoice_items.deleted_at IS 'Soft delete timestamp';
+
+-- ============================================================================
+-- RATE LIMITING TABLE (Security)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.rate_limits (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  action TEXT NOT NULL, -- 'ai_generation' | 'email_send' | 'pdf_export'
+  count INT DEFAULT 1,
+  window_start TIMESTAMPTZ DEFAULT NOW(),
+  reset_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for fast rate limit checks
+CREATE INDEX idx_rate_limits_user_action ON public.rate_limits(user_id, action, window_start);
+CREATE INDEX idx_rate_limits_reset ON public.rate_limits(reset_at);
+
+-- RLS Policies for rate_limits
+ALTER TABLE public.rate_limits ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own rate limits"
+  ON public.rate_limits FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Service role can manage rate limits"
+  ON public.rate_limits FOR ALL
+  USING (auth.role() = 'service_role');
+
+COMMENT ON TABLE public.rate_limits IS 'Rate limiting for API abuse prevention';

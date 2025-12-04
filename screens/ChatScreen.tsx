@@ -7,6 +7,7 @@ import { Button } from '../components/Button';
 import { Client, DocType, DocumentData, UserProfile, IWindow, TemplateBlock, InvoiceItem } from '../types';
 import { triggerHaptic } from '../App';
 import { generateDocumentContent } from '../services/geminiService';
+import { sanitizeInput, containsInjection } from '../services/securityService';
 
 interface ChatScreenProps {
   clients: Client[];
@@ -130,9 +131,23 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
 
   const processNapkinSketch = async () => {
       if (!napkinText) return;
+      
+      // Security: Sanitize and validate input
+      const sanitized = sanitizeInput(napkinText, 1000); // Allow up to 1000 chars for AI prompts
+      
+      if (containsInjection(sanitized)) {
+        alert('Invalid input detected. Please remove any special characters or code.');
+        return;
+      }
+      
+      if (sanitized.length < 10) {
+        alert('Please provide more details about the work done.');
+        return;
+      }
+      
       setIsProcessingNapkin(true);
       try {
-          const result = await generateDocumentContent(napkinText, DocType.INVOICE, clientName, profile.companyName);
+          const result = await generateDocumentContent(sanitized, DocType.INVOICE, clientName, profile.companyName);
           if (result.items) {
               const newItems = result.items.map((i: any) => ({...i, id: Math.random().toString()}));
               setJobItems(prev => [...prev, ...newItems]);

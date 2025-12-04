@@ -97,6 +97,72 @@ PRICING STRATEGY:
   `;
 }
 
+// Rate limiting helper
+async function checkRateLimit(userId: string, action: string, limit: number, windowMinutes: number): Promise<{ allowed: boolean, remaining: number }> {
+  try {
+    // @ts-ignore - Deno global
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    // @ts-ignore - Deno global
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.log('[Rate Limit] Missing Supabase credentials, allowing request')
+      return { allowed: true, remaining: limit }
+    }
+
+    const now = new Date()
+    const windowStart = new Date(now.getTime() - windowMinutes * 60 * 1000)
+    
+    // Check current rate limit count
+    const checkResponse = await fetch(
+      `${supabaseUrl}/rest/v1/rate_limits?user_id=eq.${userId}&action=eq.${action}&window_start=gte.${windowStart.toISOString()}&select=count`,
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    
+    const existingLimits = await checkResponse.json()
+    const currentCount = existingLimits?.length || 0
+    
+    if (currentCount >= limit) {
+      console.log(`[Rate Limit] User ${userId} exceeded limit for ${action}: ${currentCount}/${limit}`)
+      return { allowed: false, remaining: 0 }
+    }
+    
+    // Record this request
+    const resetAt = new Date(now.getTime() + windowMinutes * 60 * 1000)
+    await fetch(
+      `${supabaseUrl}/rest/v1/rate_limits`,
+      {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          action: action,
+          count: 1,
+          window_start: now.toISOString(),
+          reset_at: resetAt.toISOString()
+        })
+      }
+    )
+    
+    return { allowed: true, remaining: limit - currentCount - 1 }
+  } catch (error) {
+    console.error('[Rate Limit] Error checking rate limit:', error)
+    // On error, allow request but log the issue
+    return { allowed: true, remaining: limit }
+  }
+}
+
 serve(async (req: Request) => {
   // CORS headers
   if (req.method === 'OPTIONS') {
@@ -179,7 +245,43 @@ serve(async (req: Request) => {
     const request = validateRequest(body)
     console.log('[AI Service] Request validated successfully')
 
-    // Rate limit check (basic: 10 requests per minute per IP)
+    // Extract user ID from auth header
+    const authHeader = req.headers.get('Authorization')
+    let userId = 'anonymous'
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.replace('Bearer ', '')
+        // Decode JWT to get user ID (basic decoding without verification)
+        const payload = JSON.parse(atob(token.split('.')[1]))
+        userId = payload.sub || 'anonymous'
+      } catch (e) {
+        console.log('[AI Service] Could not extract user ID from token')
+      }
+    }
+
+    // Rate limiting: 10 AI requests per hour per user
+    const rateLimit = await checkRateLimit(userId, 'ai_generation', 10, 60)
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded',
+          message: 'You have exceeded the maximum number of AI requests (10 per hour). Please try again later.',
+          retryAfter: 3600 // seconds
+        }),
+        { 
+          status: 429,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'Retry-After': '3600'
+          }
+        }
+      )
+    }
+
+    // Rate limit check (basic: 10 requests per minute per IP) - DEPRECATED, keeping for backwards compat
     const clientIp = req.headers.get('x-forwarded-for') || 'unknown'
     const cacheKey = `rate_limit:${clientIp}`
     // In production, use Deno.redis or similar for rate limiting

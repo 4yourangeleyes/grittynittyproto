@@ -100,6 +100,7 @@ export interface DocumentData {
   contractId?: string; // Optional: selected contract to attach when sending
   notes?: string; // Invoice notes/terms displayed before totals
   shareableLink?: string; // Link to publicly view invoice
+  shareLinkExpiresAt?: string; // ISO date string - when shareable link expires (default: 30 days)
   // Invoice specific
   items?: InvoiceItem[];
   subtotal?: number;

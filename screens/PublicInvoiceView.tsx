@@ -11,13 +11,43 @@ const PublicInvoiceView: React.FC<PublicInvoiceViewProps> = ({ documents }) => {
   const { docId } = useParams<{ docId: string }>();
   const [doc, setDoc] = useState<DocumentData | null>(null);
   const [isMarkedPaid, setIsMarkedPaid] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
     if (docId) {
       const found = documents.find(d => d.id === docId);
+      
+      // Check if link has expired
+      if (found && found.shareLinkExpiresAt) {
+        const expiryDate = new Date(found.shareLinkExpiresAt);
+        const now = new Date();
+        if (now > expiryDate) {
+          setIsExpired(true);
+          setDoc(null);
+          return;
+        }
+      }
+      
       setDoc(found || null);
     }
   }, [docId, documents]);
+
+  if (isExpired) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center max-w-md">
+          <AlertCircle size={48} className="mx-auto text-red-400 mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900">Link Expired</h1>
+          <p className="text-gray-500 mt-2">
+            This invoice link has expired for security reasons.
+          </p>
+          <p className="text-gray-400 mt-4 text-sm">
+            Please contact the sender to request a new link.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!doc) {
     return (
