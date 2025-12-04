@@ -1,11 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 // Test credentials from environment variables
 const TEST_EMAIL = process.env.TEST_USER_EMAIL || 'test@gritdocs.com';
 const TEST_PASSWORD = process.env.TEST_USER_PASSWORD || 'testpassword123';
 
 // Helper function to login
-async function login(page) {
+async function login(page: Page) {
   await page.goto('/');
   
   const emailInput = page.getByPlaceholder(/email/i);
