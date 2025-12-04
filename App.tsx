@@ -13,6 +13,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { DocumentCreationWizard } from './components/DocumentCreationWizard';
 import { ContractType } from './types';
 import { getClausesForContractType } from './services/clauseLibrary';
+import * as Sentry from '@sentry/react';
 
 // Lazy Load Screens for Performance
 const LoginScreen = lazy(() => import('./screens/LoginScreen'));
@@ -30,6 +31,38 @@ const PageLoader = () => (
     <Loader className="animate-spin text-grit-primary" size={32} />
   </div>
 );
+
+// Initialize Sentry for error monitoring
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    environment: import.meta.env.VITE_SENTRY_ENVIRONMENT || 'production',
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration({
+        maskAllText: false,
+        blockAllMedia: false,
+      }),
+    ],
+    // Performance Monitoring
+    tracesSampleRate: 0.5, // 50% of transactions for performance monitoring
+    // Session Replay
+    replaysSessionSampleRate: 0.1, // 10% of sessions
+    replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
+    beforeSend(event, hint) {
+      // Filter out development errors
+      if (import.meta.env.DEV) {
+        return null;
+      }
+      // Add custom context
+      if (event.exception) {
+        console.error('Error captured by Sentry:', event.exception);
+      }
+      return event;
+    },
+  });
+  console.log('✅ Sentry error monitoring initialized');
+}
 
 // Smart Defaults
 const DETECTED_CURRENCY = new Intl.NumberFormat().resolvedOptions().currency === 'EUR' ? '€' : 

@@ -18,6 +18,24 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      build: {
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              // Split vendor code
+              'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+              'vendor-icons': ['lucide-react'],
+              // Split heavy services into separate chunks
+              'pdf-service': ['./services/pdfService'],
+              'email-service': ['./services/emailService'],
+              // Split theme renderers
+              'invoice-themes': ['./components/InvoiceThemeRenderer'],
+              'contract-themes': ['./components/ContractThemeRenderer']
+            }
+          }
+        },
+        chunkSizeWarningLimit: 600, // Increase to 600KB for vendor bundles
       }
     };
 });

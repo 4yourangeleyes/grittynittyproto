@@ -5,8 +5,6 @@ import { Button } from '../components/Button';
 import { Input, TextArea } from '../components/Input';
 import { useNavigate } from 'react-router-dom';
 import { triggerHaptic } from '../App';
-import { generateInvoicePDF, generateInvoicePDFBase64, extractInvoiceHTML } from '../services/pdfService';
-import { sendInvoiceEmail, isValidEmail } from '../services/emailService';
 import { InvoiceThemeRenderer } from '../components/InvoiceThemeRenderer';
 import { ContractThemeRenderer } from '../components/ContractThemeRenderer';
 import { Client } from '../types';
@@ -286,6 +284,9 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
     setIsExportingPDF(true);
     setShowPDFMenu(false);
     try {
+      // Dynamic import of PDF service
+      const { extractInvoiceHTML, generateInvoicePDF } = await import('../services/pdfService');
+      
       // Use extractInvoiceHTML to clean up the content (convert inputs to text, remove buttons)
       const htmlContent = extractInvoiceHTML(invoiceRef.current);
       
@@ -316,6 +317,10 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
       setEmailError('Client email is required');
       return;
     }
+
+    // Dynamic import of email service
+    const { isValidEmail, sendInvoiceEmail } = await import('../services/emailService');
+    const { extractInvoiceHTML, generateInvoicePDFBase64 } = await import('../services/pdfService');
 
     if (!isValidEmail(doc.client.email)) {
       setEmailError('Invalid email address');

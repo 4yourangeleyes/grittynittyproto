@@ -56,6 +56,12 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
   
   // Template Block Selection State
   const [selectedTemplateItems, setSelectedTemplateItems] = useState<Set<string>>(new Set());
+  
+  // Save Template State
+  const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
+  const [saveTemplateName, setSaveTemplateName] = useState('');
+  const [saveTemplateCategory, setSaveTemplateCategory] = useState('Custom');
+  const [lastAiGeneratedItems, setLastAiGeneratedItems] = useState<InvoiceItem[]>([]);
 
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -130,6 +136,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
           if (result.items) {
               const newItems = result.items.map((i: any) => ({...i, id: Math.random().toString()}));
               setJobItems(prev => [...prev, ...newItems]);
+              setLastAiGeneratedItems(newItems); // Track AI-generated items
               setNapkinText('');
               setScopeMode('manual');
               triggerHaptic('success');
@@ -139,6 +146,29 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
       } finally {
           setIsProcessingNapkin(false);
       }
+  };
+
+  const handleSaveAiAsTemplate = () => {
+      if (!saveTemplateName.trim() || lastAiGeneratedItems.length === 0) return;
+      
+      const newTemplate: TemplateBlock = {
+          id: `template-${Date.now()}`,
+          name: saveTemplateName,
+          category: saveTemplateCategory,
+          type: DocType.INVOICE,
+          items: lastAiGeneratedItems.map(item => ({
+              ...item,
+              id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}` // Fresh IDs
+          }))
+      };
+      
+      setTemplates(prev => [...prev, newTemplate]);
+      setShowSaveTemplateModal(false);
+      setSaveTemplateName('');
+      setSaveTemplateCategory('Custom');
+      setLastAiGeneratedItems([]);
+      triggerHaptic('success');
+      alert(`Template "${saveTemplateName}" saved! You can now reuse it from the Templates section.`);
   };
 
   const toggleTemplateItemSelection = (templateId: string, itemId: string) => {
@@ -405,6 +435,17 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
                   >
                       {isProcessingNapkin ? 'Magic Working...' : 'Convert to Invoice'}
                   </Button>
+                  
+                  {/* Save AI Template Button - Show after AI generates items */}
+                  {lastAiGeneratedItems.length > 0 && (
+                      <button
+                          onClick={() => setShowSaveTemplateModal(true)}
+                          className="w-full mt-2 px-4 py-2 bg-green-100 text-green-700 border-2 border-green-300 rounded font-bold hover:bg-green-200 transition-colors flex items-center justify-center gap-2"
+                      >
+                          <Package size={18} />
+                          Save AI Items as Template
+                      </button>
+                  )}
               </div>
           )}
 
@@ -500,6 +541,75 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
               </div>
           )}
       </div>
+      
+      {/* Save Template Modal */}
+      {showSaveTemplateModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
+                  <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                      <Package className="text-green-600" size={24} />
+                      Save AI Template
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                      Save these {lastAiGeneratedItems.length} AI-generated items as a reusable template.
+                  </p>
+                  
+                  <div className="space-y-4">
+                      <div>
+                          <label className="block text-sm font-bold mb-2">Template Name *</label>
+                          <input
+                              type="text"
+                              value={saveTemplateName}
+                              onChange={e => setSaveTemplateName(e.target.value)}
+                              placeholder="e.g. Emergency Plumbing Service"
+                              className="w-full px-4 py-2 border-2 border-gray-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary"
+                              autoFocus
+                          />
+                      </div>
+                      
+                      <div>
+                          <label className="block text-sm font-bold mb-2">Category</label>
+                          <input
+                              type="text"
+                              value={saveTemplateCategory}
+                              onChange={e => setSaveTemplateCategory(e.target.value)}
+                              placeholder="e.g. Plumber, Electrician"
+                              className="w-full px-4 py-2 border-2 border-gray-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary"
+                          />
+                      </div>
+                      
+                      <div className="bg-gray-50 p-3 rounded border-2 border-gray-200 max-h-40 overflow-y-auto">
+                          <p className="text-xs font-bold text-gray-500 mb-2">Items to Save:</p>
+                          {lastAiGeneratedItems.map((item, idx) => (
+                              <div key={idx} className="text-xs text-gray-700 mb-1">
+                                  • {item.description} ({item.quantity} {item.unitType} × {profile.currency}{item.price})
+                              </div>
+                          ))}
+                      </div>
+                  </div>
+                  
+                  <div className="flex gap-3 mt-6">
+                      <button
+                          onClick={() => {
+                              setShowSaveTemplateModal(false);
+                              setSaveTemplateName('');
+                              setSaveTemplateCategory('Custom');
+                          }}
+                          className="flex-1 px-4 py-2 border-2 border-gray-300 rounded font-bold hover:bg-gray-100 transition-colors"
+                      >
+                          Cancel
+                      </button>
+                      <button
+                          onClick={handleSaveAiAsTemplate}
+                          disabled={!saveTemplateName.trim()}
+                          className="flex-1 px-4 py-2 bg-grit-primary text-white rounded font-bold hover:bg-grit-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                          Save Template
+                      </button>
+                  </div>
+              </div>
+          </div>
+      )}
     </div>
   );
 };
