@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mic, ArrowRight, ArrowLeft, Plus, Trash2, CheckCircle2, Package, User, FileText, Sparkles, LayoutGrid, PenTool, Wrench, Zap, Box, ShoppingCart, Type } from 'lucide-react';
 import { Button } from '../components/Button';
-import { Client, DocType, DocumentData, UserProfile, IWindow, TemplateBlock, InvoiceItem } from '../types';
+import { Client, DocType, DocumentData, UserProfile, IWindow, TemplateBlock, InvoiceItem, ContractClause, ContractType } from '../types';
 import { triggerHaptic } from '../App';
 import { generateDocumentContent } from '../services/geminiService';
 import { sanitizeInput, containsInjection } from '../services/securityService';
@@ -38,11 +38,17 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
   // Wizard State
   const [step, setStep] = useState(1);
   const [scopeMode, setScopeMode] = useState<'manual' | 'napkin'>('manual');
+  const [docMode, setDocMode] = useState<'INVOICE' | 'CONTRACT'>('INVOICE'); // NEW: Document type toggle
 
   // Job Data
   const [clientName, setClientName] = useState('');
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [jobItems, setJobItems] = useState<InvoiceItem[]>([]);
+  
+  // Contract Data (NEW)
+  const [contractClauses, setContractClauses] = useState<ContractClause[]>([]);
+  const [contractTitle, setContractTitle] = useState('');
+  const [contractType, setContractType] = useState<ContractType>(ContractType.SERVICE_AGREEMENT);
   
   // Napkin Sketch State
   const [napkinText, setNapkinText] = useState('');
@@ -58,11 +64,12 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
   // Template Block Selection State
   const [selectedTemplateItems, setSelectedTemplateItems] = useState<Set<string>>(new Set());
   
-  // Save Template State
+  // AI Preview Modal State (Invoice or Contract)
   const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
   const [saveTemplateName, setSaveTemplateName] = useState('');
-  const [saveTemplateCategory, setSaveTemplateCategory] = useState('Custom');
+  const [saveTemplateCategory, setSaveTemplateCategory] = useState('');
   const [lastAiGeneratedItems, setLastAiGeneratedItems] = useState<InvoiceItem[]>([]);
+  const [lastAiGeneratedClauses, setLastAiGeneratedClauses] = useState<ContractClause[]>([]); // NEW
 
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -147,20 +154,40 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
       
       setIsProcessingNapkin(true);
       try {
-          const result = await generateDocumentContent(sanitized, DocType.INVOICE, clientName, profile.companyName, profile.industry);
-          if (result.items) {
+          // Call AI with correct docType based on docMode
+          const aiDocType = docMode === 'INVOICE' ? DocType.INVOICE : DocType.CONTRACT;
+          const result = await generateDocumentContent(
+            sanitized, 
+            aiDocType, 
+            clientName, 
+            profile.companyName, 
+            profile.industry
+          );
+          
+          if (docMode === 'INVOICE' && result.items) {
+              // Invoice generation
               const newItems = result.items.map((i: any) => ({...i, id: Math.random().toString()}));
-              
-              // IMPROVED UX: Show items in preview modal first (don't auto-add to job)
               setLastAiGeneratedItems(newItems);
-              setShowSaveTemplateModal(true); // Open preview modal
-              setSaveTemplateName(result.title || 'AI Generated Template'); // Pre-fill name
-              
+              setShowSaveTemplateModal(true);
+              setSaveTemplateName(result.title || 'AI Generated Invoice');
+              setNapkinText('');
+              triggerHaptic('success');
+          } else if (docMode === 'CONTRACT' && result.clauses) {
+              // Contract generation
+              const newClauses = result.clauses.map((c: any, idx: number) => ({
+                  ...c,
+                  id: c.id || `clause-${Date.now()}-${idx}`,
+                  order: idx
+              }));
+              setLastAiGeneratedClauses(newClauses);
+              setContractTitle(result.title || 'AI Generated Contract');
+              setShowSaveTemplateModal(true);
+              setSaveTemplateName(result.title || 'AI Generated Contract');
               setNapkinText('');
               triggerHaptic('success');
           }
       } catch (e) {
-          alert("Could not parse napkin sketch. Please try again.");
+          alert(`Could not parse ${docMode.toLowerCase()}. Please try again.`);
       } finally {
           setIsProcessingNapkin(false);
       }
@@ -211,8 +238,62 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
       setSaveTemplateName('');
       setSaveTemplateCategory('');
       setLastAiGeneratedItems([]);
+      setLastAiGeneratedClauses([]);
       setScopeMode('manual');
       triggerHaptic('light');
+  };
+
+  // NEW: Contract clause editing
+  const handleEditClause = (clauseId: string, newContent: string) => {
+      setLastAiGeneratedClauses(prev => 
+          prev.map(c => c.id === clauseId ? {...c, content: newContent} : c)
+      );
+  };
+
+  // NEW: Add clauses to contract
+  const handleAddAiClausesToContract = () => {
+      if (lastAiGeneratedClauses.length === 0) return;
+      
+      setContractClauses(lastAiGeneratedClauses);
+      setShowSaveTemplateModal(false);
+      setSaveTemplateName('');
+      setSaveTemplateCategory('');
+      setLastAiGeneratedClauses([]);
+      setScopeMode('manual');
+      triggerHaptic('success');
+      
+      // Move to step 3 (Review) to finalize contract
+      setStep(3);
+  };
+
+  // NEW: Create contract from clauses
+  const handleCreateContract = () => {
+      if (!clientName || contractClauses.length === 0) return;
+      
+      let client = clients.find(c => c.businessName.toLowerCase() === clientName.toLowerCase());
+      if (!client) {
+          client = { id: Date.now().toString(), businessName: clientName, email: '' };
+          setClients(prev => [...prev, client!]);
+      }
+      
+      const newContract: DocumentData = {
+          id: crypto.randomUUID(),
+          type: DocType.CONTRACT,
+          status: 'Draft',
+          title: contractTitle || `Contract for ${clientName}`,
+          client: client,
+          date: new Date().toISOString().split('T')[0],
+          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          currency: profile.currency,
+          clauses: contractClauses,
+          contractType: contractType,
+          theme: 'legal' as const,
+          userId: profile.id
+      };
+      
+      // Save contract and navigate to Canvas
+      onDocGenerated(newContract);
+      navigate('/canvas', { state: { documentId: newContract.id, docType: DocType.CONTRACT } });
   };
 
   const toggleTemplateItemSelection = (templateId: string, itemId: string) => {
@@ -342,16 +423,34 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
 
   const renderStep2_Scope = () => (
       <div className="animate-in slide-in-from-right-8 fade-in duration-300 flex flex-col h-full">
-          <label className="block text-2xl font-bold mb-4 tracking-tight">Add Line Items</label>
+          <label className="block text-2xl font-bold mb-4 tracking-tight">
+              {docMode === 'INVOICE' ? 'Add Line Items' : 'Generate Contract Clauses'}
+          </label>
+          
+          {/* Document Type Toggle (NEW) */}
+          <div className="flex gap-2 mb-4 p-2 bg-gray-100 rounded-lg w-fit">
+              <button 
+                  onClick={() => { setDocMode('INVOICE'); setContractClauses([]); }}
+                  className={`px-4 py-2 font-bold rounded transition-colors ${docMode === 'INVOICE' ? 'bg-grit-primary text-white' : 'text-gray-600 hover:bg-gray-200'}`}
+              >
+                  💰 Invoice
+              </button>
+              <button 
+                  onClick={() => { setDocMode('CONTRACT'); setJobItems([]); }}
+                  className={`px-4 py-2 font-bold rounded transition-colors ${docMode === 'CONTRACT' ? 'bg-grit-primary text-white' : 'text-gray-600 hover:bg-gray-200'}`}
+              >
+                  📄 Contract
+              </button>
+          </div>
           
           {/* Scope Mode Tabs */}
           <div className="flex gap-2 mb-4 border-b-2 border-gray-200 pb-1">
-              <button onClick={() => setScopeMode('manual')} className={`px-3 py-1 font-bold rounded-t-lg transition-colors ${scopeMode === 'manual' ? 'bg-grit-dark text-white' : 'text-gray-400'}`}>Detailed</button>
-              <button onClick={() => setScopeMode('napkin')} className={`px-3 py-1 font-bold rounded-t-lg transition-colors ${scopeMode === 'napkin' ? 'bg-grit-dark text-white' : 'text-gray-400'}`}>Napkin Sketch</button>
+              <button onClick={() => setScopeMode('manual')} className={`px-3 py-1 font-bold rounded-t-lg transition-colors ${scopeMode === 'manual' ? 'bg-grit-dark text-white' : 'text-gray-400'}`}>Manual</button>
+              <button onClick={() => setScopeMode('napkin')} className={`px-3 py-1 font-bold rounded-t-lg transition-colors ${scopeMode === 'napkin' ? 'bg-grit-dark text-white' : 'text-gray-400'}`}>✨ AI Generate</button>
           </div>
 
-          {/* MANUAL MODE */}
-          {scopeMode === 'manual' && (
+          {/* INVOICE MODE */}
+          {docMode === 'INVOICE' && (
               <div className="mb-4">
                   <div className="bg-grit-white border-2 border-grit-dark p-4 shadow-sm mb-4 rounded-lg relative animate-in fade-in">
                       <div className="mb-4 relative">
@@ -495,44 +594,126 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
 
           {/* List */}
           <div className="flex-1 overflow-y-auto space-y-3 mb-4 pr-1">
-              {jobItems.length === 0 && <div className="text-center text-gray-400 mt-8 italic">No items added yet.</div>}
-              {jobItems.map((item, idx) => (
-                  <div key={idx} className="flex justify-between items-center bg-white p-3 border border-gray-200 rounded shadow-sm hover:border-grit-dark transition-colors">
-                      <div className="flex-1">
-                          <p className="font-bold text-lg leading-tight">{item.description}</p>
-                          <div className="text-xs text-gray-500 font-mono mt-1 flex gap-2">
-                              <span className="bg-gray-100 px-1 rounded">{item.quantity} {item.unitType}</span>
-                              <span>x</span>
-                              <span>{profile.currency}{item.price}</span>
+              {docMode === 'INVOICE' && (
+                  <>
+                      {jobItems.length === 0 && <div className="text-center text-gray-400 mt-8 italic">No items added yet.</div>}
+                      {jobItems.map((item, idx) => (
+                          <div key={idx} className="flex justify-between items-center bg-white p-3 border border-gray-200 rounded shadow-sm hover:border-grit-dark transition-colors">
+                              <div className="flex-1">
+                                  <p className="font-bold text-lg leading-tight">{item.description}</p>
+                                  <div className="text-xs text-gray-500 font-mono mt-1 flex gap-2">
+                                      <span className="bg-gray-100 px-1 rounded">{item.quantity} {item.unitType}</span>
+                                      <span>x</span>
+                                      <span>{profile.currency}{item.price}</span>
+                                  </div>
+                              </div>
+                              <div className="flex items-center gap-4 pl-4">
+                                  <span className="font-mono font-bold text-lg">{profile.currency}{(item.price * item.quantity).toFixed(2)}</span>
+                                  <button onClick={() => setJobItems(prev => prev.filter((_, i) => i !== idx))} className="text-gray-300 hover:text-red-500 p-2"><Trash2 size={18}/></button>
+                              </div>
                           </div>
-                      </div>
-                      <div className="flex items-center gap-4 pl-4">
-                          <span className="font-mono font-bold text-lg">{profile.currency}{(item.price * item.quantity).toFixed(2)}</span>
-                          <button onClick={() => setJobItems(prev => prev.filter((_, i) => i !== idx))} className="text-gray-300 hover:text-red-500 p-2"><Trash2 size={18}/></button>
-                      </div>
-                  </div>
-              ))}
+                      ))}
+                  </>
+              )}
+              
+              {/* CONTRACT CLAUSES LIST */}
+              {docMode === 'CONTRACT' && (
+                  <>
+                      {contractClauses.length === 0 && <div className="text-center text-gray-400 mt-8 italic">No clauses added yet.</div>}
+                      {contractClauses.map((clause, idx) => (
+                          <div key={idx} className="bg-white p-4 border-2 border-gray-200 rounded shadow-sm hover:border-grit-dark transition-colors">
+                              <p className="font-bold text-lg text-grit-primary">{clause.title}</p>
+                              <p className="text-sm text-gray-700 mt-2 leading-relaxed">{clause.content}</p>
+                              <button 
+                                  onClick={() => setContractClauses(prev => prev.filter((_, i) => i !== idx))} 
+                                  className="text-gray-300 hover:text-red-500 p-2 mt-2"
+                              >
+                                  <Trash2 size={18}/>
+                              </button>
+                          </div>
+                      ))}
+                  </>
+              )}
           </div>
+          
+          {/* CONTRACT MODE (NEW) */}
+          {docMode === 'CONTRACT' && scopeMode === 'napkin' && (
+              <div className="mb-6 animate-in fade-in">
+                  <div className="bg-blue-50 p-3 rounded border-2 border-blue-200 mb-4">
+                      <p className="text-xs font-bold text-blue-800 mb-2">📝 CONTRACT GENERATION</p>
+                      <p className="text-xs text-blue-700">Describe the contract terms, scope, and key points. AI will generate professional clauses.</p>
+                  </div>
+                  
+                  <label className="block text-sm font-bold mb-2">Contract Type</label>
+                  <select
+                      value={contractType}
+                      onChange={e => setContractType(e.target.value as ContractType)}
+                      className="w-full mb-3 px-3 py-2 border-2 border-gray-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary"
+                  >
+                      {Object.values(ContractType).map(ct => (
+                          <option key={ct} value={ct}>{ct}</option>
+                      ))}
+                  </select>
+                  
+                  <p className="text-xs text-gray-500 mb-2 font-bold">Type or speak. AI will generate clauses.</p>
+                  <div className="relative">
+                      <textarea 
+                        className="w-full h-32 p-4 font-draft text-xl border-2 border-grit-dark rounded focus:ring-2 focus:ring-grit-primary resize-none bg-blue-50"
+                        placeholder="e.g. 30-day project starting Jan 15, payment on completion, IP ownership to client, 2-week warranty..."
+                        value={napkinText}
+                        onChange={e => setNapkinText(e.target.value)}
+                      />
+                      <button className={`absolute right-2 bottom-2 text-gray-400 ${isRecording ? 'text-red-500 animate-pulse' : ''}`} onClick={toggleRecording}><Mic size={24} /></button>
+                  </div>
+                  <Button 
+                    className="w-full mt-2" 
+                    onClick={processNapkinSketch} 
+                    disabled={!napkinText || isProcessingNapkin} 
+                    icon={isProcessingNapkin ? <Sparkles className="animate-spin"/> : <Sparkles />}
+                  >
+                      {isProcessingNapkin ? 'Generating Clauses...' : 'Generate Contract Clauses'}
+                  </Button>
+              </div>
+          )}
       </div>
   );
 
   const renderStep3_Review = () => {
-      const subtotal = jobItems.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-      return (
-        <div className="animate-in slide-in-from-right-8 fade-in duration-300 text-center flex flex-col items-center justify-center h-full">
-             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 border-4 border-white shadow-xl animate-bounce"><Sparkles size={40} className="text-green-600"/></div>
-             <h2 className="text-3xl font-bold mb-2">Ready?</h2>
-             <p className="text-gray-500 mb-8 max-w-xs">Create draft for <span className="font-bold text-grit-dark">{clientName}</span>.</p>
-             <div className="bg-white border-2 border-grit-dark p-6 w-full max-w-sm shadow-grit mb-8 text-left relative transform rotate-1 hover:rotate-0 transition-transform duration-300">
-                 <div className="flex justify-between items-end border-b-2 border-dashed border-gray-200 pb-4 mb-4">
-                     <div><p className="text-xs uppercase text-gray-400 font-bold">Client</p><p className="font-bold text-xl">{clientName}</p></div>
-                     <div className="text-right"><p className="text-xs uppercase text-gray-400 font-bold">Items</p><p className="font-bold text-xl">{jobItems.length}</p></div>
+      if (docMode === 'INVOICE') {
+          const subtotal = jobItems.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+          return (
+            <div className="animate-in slide-in-from-right-8 fade-in duration-300 text-center flex flex-col items-center justify-center h-full">
+                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 border-4 border-white shadow-xl animate-bounce"><Sparkles size={40} className="text-green-600"/></div>
+                 <h2 className="text-3xl font-bold mb-2">Ready?</h2>
+                 <p className="text-gray-500 mb-8 max-w-xs">Create draft for <span className="font-bold text-grit-dark">{clientName}</span>.</p>
+                 <div className="bg-white border-2 border-grit-dark p-6 w-full max-w-sm shadow-grit mb-8 text-left relative transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                     <div className="flex justify-between items-end border-b-2 border-dashed border-gray-200 pb-4 mb-4">
+                         <div><p className="text-xs uppercase text-gray-400 font-bold">Client</p><p className="font-bold text-xl">{clientName}</p></div>
+                         <div className="text-right"><p className="text-xs uppercase text-gray-400 font-bold">Items</p><p className="font-bold text-xl">{jobItems.length}</p></div>
+                     </div>
+                     <div className="flex justify-between items-center"><p className="font-bold text-gray-500">Total</p><p className="font-bold text-3xl font-mono">{profile.currency}{subtotal.toFixed(2)}</p></div>
                  </div>
-                 <div className="flex justify-between items-center"><p className="font-bold text-gray-500">Total</p><p className="font-bold text-3xl font-mono">{profile.currency}{subtotal.toFixed(2)}</p></div>
-             </div>
-             <Button size="lg" className="w-full max-w-sm py-4 text-xl shadow-xl" onClick={handleCreateInvoice} icon={<CheckCircle2 />}>Create Invoice</Button>
-        </div>
-      );
+                 <Button size="lg" className="w-full max-w-sm py-4 text-xl shadow-xl" onClick={handleCreateInvoice} icon={<CheckCircle2 />}>Create Invoice</Button>
+            </div>
+          );
+      } else {
+          // CONTRACT MODE
+          return (
+            <div className="animate-in slide-in-from-right-8 fade-in duration-300 text-center flex flex-col items-center justify-center h-full">
+                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6 border-4 border-white shadow-xl animate-bounce"><FileText size={40} className="text-blue-600"/></div>
+                 <h2 className="text-3xl font-bold mb-2">Contract Ready</h2>
+                 <p className="text-gray-500 mb-8 max-w-xs">Create contract for <span className="font-bold text-grit-dark">{clientName}</span>.</p>
+                 <div className="bg-white border-2 border-grit-dark p-6 w-full max-w-sm shadow-grit mb-8 text-left relative transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                     <div className="flex justify-between items-end border-b-2 border-dashed border-gray-200 pb-4 mb-4">
+                         <div><p className="text-xs uppercase text-gray-400 font-bold">Client</p><p className="font-bold text-xl">{clientName}</p></div>
+                         <div className="text-right"><p className="text-xs uppercase text-gray-400 font-bold">Clauses</p><p className="font-bold text-xl">{contractClauses.length}</p></div>
+                     </div>
+                     <div className="flex justify-between items-center"><p className="font-bold text-gray-500">Type</p><p className="font-bold text-lg">{contractType}</p></div>
+                 </div>
+                 <Button size="lg" className="w-full max-w-sm py-4 text-xl shadow-xl" onClick={handleCreateContract} icon={<FileText />}>Create & Open Contract</Button>
+            </div>
+          );
+      }
   };
 
   return (
@@ -586,91 +767,170 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
           )}
       </div>
       
-      {/* AI Preview & Template Save Modal */}
+      {/* AI Preview & Template Save Modal - Works for both Invoices and Contracts */}
       {showSaveTemplateModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
-                  <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                      <Sparkles className="text-grit-primary" size={24} />
-                      AI Generated Items
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                      Review {lastAiGeneratedItems.length} AI-generated {lastAiGeneratedItems.length === 1 ? 'item' : 'items'} and choose what to do:
-                  </p>
-                  
-                  <div className="space-y-4">
-                      {/* Preview Items */}
-                      <div className="bg-gray-50 p-3 rounded border-2 border-gray-200 max-h-60 overflow-y-auto">
-                          <p className="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wide">Generated Items:</p>
-                          {lastAiGeneratedItems.map((item, idx) => (
-                              <div key={idx} className="bg-white p-2 rounded mb-2 border border-gray-200">
-                                  <p className="text-sm font-bold text-gray-800">{item.description}</p>
-                                  <p className="text-xs text-gray-600 mt-1">
-                                      {item.quantity} {item.unitType} × {profile.currency}{item.price.toFixed(2)} = <span className="font-bold">{profile.currency}{(item.quantity * item.price).toFixed(2)}</span>
+                  {docMode === 'INVOICE' ? (
+                      <>
+                          <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
+                              <Sparkles className="text-grit-primary" size={24} />
+                              AI Generated Items
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-4">
+                              Review {lastAiGeneratedItems.length} AI-generated {lastAiGeneratedItems.length === 1 ? 'item' : 'items'} and choose what to do:
+                          </p>
+                          
+                          <div className="space-y-4">
+                              {/* Preview Invoice Items */}
+                              <div className="bg-gray-50 p-3 rounded border-2 border-gray-200 max-h-60 overflow-y-auto">
+                                  <p className="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wide">Generated Items:</p>
+                                  {lastAiGeneratedItems.map((item, idx) => (
+                                      <div key={idx} className="bg-white p-2 rounded mb-2 border border-gray-200">
+                                          <p className="text-sm font-bold text-gray-800">{item.description}</p>
+                                          <p className="text-xs text-gray-600 mt-1">
+                                              {item.quantity} {item.unitType} × {profile.currency}{item.price.toFixed(2)} = <span className="font-bold">{profile.currency}{(item.quantity * item.price).toFixed(2)}</span>
+                                          </p>
+                                      </div>
+                                  ))}
+                                  <div className="mt-3 pt-3 border-t border-gray-300">
+                                      <p className="text-sm font-bold text-gray-800">
+                                          Total: <span className="text-grit-primary text-lg">{profile.currency}{lastAiGeneratedItems.reduce((sum, i) => sum + (i.quantity * i.price), 0).toFixed(2)}</span>
+                                      </p>
+                                  </div>
+                              </div>
+                              
+                              {/* Template Name (Optional) */}
+                              <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                                  <label className="block text-xs font-bold mb-2 text-blue-800 uppercase tracking-wide">
+                                      💾 Optional: Save as Template
+                                  </label>
+                                  <input
+                                      type="text"
+                                      value={saveTemplateName}
+                                      onChange={e => setSaveTemplateName(e.target.value)}
+                                      placeholder="e.g. Kitchen Sink Repair"
+                                      className="w-full px-3 py-2 text-sm border-2 border-blue-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary mb-2"
+                                  />
+                                  <input
+                                      type="text"
+                                      value={saveTemplateCategory}
+                                      onChange={e => setSaveTemplateCategory(e.target.value)}
+                                      placeholder={`Category (default: ${profile.industry || 'Custom'})`}
+                                      className="w-full px-3 py-2 text-sm border-2 border-blue-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary"
+                                  />
+                                  <p className="text-xs text-blue-700 mt-2">
+                                      Save as a template to reuse these items later
                                   </p>
                               </div>
-                          ))}
-                          <div className="mt-3 pt-3 border-t border-gray-300">
-                              <p className="text-sm font-bold text-gray-800">
-                                  Total: <span className="text-grit-primary text-lg">{profile.currency}{lastAiGeneratedItems.reduce((sum, i) => sum + (i.quantity * i.price), 0).toFixed(2)}</span>
-                              </p>
                           </div>
-                      </div>
-                      
-                      {/* Template Name (Optional) */}
-                      <div className="bg-blue-50 p-3 rounded border border-blue-200">
-                          <label className="block text-xs font-bold mb-2 text-blue-800 uppercase tracking-wide">
-                              💾 Optional: Save as Template
-                          </label>
-                          <input
-                              type="text"
-                              value={saveTemplateName}
-                              onChange={e => setSaveTemplateName(e.target.value)}
-                              placeholder="e.g. Kitchen Sink Repair"
-                              className="w-full px-3 py-2 text-sm border-2 border-blue-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary mb-2"
-                          />
-                          <input
-                              type="text"
-                              value={saveTemplateCategory}
-                              onChange={e => setSaveTemplateCategory(e.target.value)}
-                              placeholder={`Category (default: ${profile.industry || 'Custom'})`}
-                              className="w-full px-3 py-2 text-sm border-2 border-blue-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary"
-                          />
-                          <p className="text-xs text-blue-700 mt-2">
-                              Save as a template to reuse these items later
+                          
+                          <div className="flex flex-col gap-2 mt-6">
+                              {/* Primary Action: Add to Current Job */}
+                              <button
+                                  onClick={handleAddAiItemsToJob}
+                                  className="w-full px-4 py-3 bg-grit-primary text-white rounded font-bold hover:bg-grit-dark transition-colors flex items-center justify-center gap-2"
+                              >
+                                  <CheckCircle2 size={18} />
+                                  Add to Current Job
+                              </button>
+                              
+                              {/* Secondary Action: Save as Template */}
+                              {saveTemplateName.trim() && (
+                                  <button
+                                      onClick={handleSaveAiAsTemplate}
+                                      className="w-full px-4 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                                  >
+                                      <Package size={18} />
+                                      Save as Template "{saveTemplateName}"
+                                  </button>
+                              )}
+                              
+                              {/* Tertiary Action: Discard */}
+                              <button
+                                  onClick={handleDiscardAiItems}
+                                  className="w-full px-4 py-2 border-2 border-gray-300 rounded font-bold text-gray-700 hover:bg-gray-100 transition-colors"
+                              >
+                                  Discard
+                              </button>
+                          </div>
+                      </>
+                  ) : (
+                      <>
+                          <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
+                              <Sparkles className="text-grit-primary" size={24} />
+                              AI Generated Contract
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-4">
+                              Review {lastAiGeneratedClauses.length} AI-generated {lastAiGeneratedClauses.length === 1 ? 'clause' : 'clauses'} and choose what to do:
                           </p>
-                      </div>
-                  </div>
-                  
-                  <div className="flex flex-col gap-2 mt-6">
-                      {/* Primary Action: Add to Current Job */}
-                      <button
-                          onClick={handleAddAiItemsToJob}
-                          className="w-full px-4 py-3 bg-grit-primary text-white rounded font-bold hover:bg-grit-dark transition-colors flex items-center justify-center gap-2"
-                      >
-                          <CheckCircle2 size={18} />
-                          Add to Current Job
-                      </button>
-                      
-                      {/* Secondary Action: Save as Template */}
-                      {saveTemplateName.trim() && (
-                          <button
-                              onClick={handleSaveAiAsTemplate}
-                              className="w-full px-4 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-                          >
-                              <Package size={18} />
-                              Save as Template "{saveTemplateName}"
-                          </button>
-                      )}
-                      
-                      {/* Tertiary Action: Discard */}
-                      <button
-                          onClick={handleDiscardAiItems}
-                          className="w-full px-4 py-2 border-2 border-gray-300 rounded font-bold text-gray-700 hover:bg-gray-100 transition-colors"
-                      >
-                          Discard
-                      </button>
-                  </div>
+                          
+                          <div className="space-y-4">
+                              {/* Preview Contract Clauses */}
+                              <div className="bg-gray-50 p-3 rounded border-2 border-gray-200 max-h-60 overflow-y-auto">
+                                  <p className="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wide">Generated Clauses:</p>
+                                  {lastAiGeneratedClauses.map((clause, idx) => (
+                                      <div key={idx} className="bg-white p-2 rounded mb-2 border border-gray-200">
+                                          <div className="flex items-center justify-between">
+                                              <p className="text-sm font-bold text-gray-800">{clause.title}</p>
+                                              {clause.required && (
+                                                  <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded font-bold">Required</span>
+                                              )}
+                                          </div>
+                                          <p className="text-xs text-gray-600 mt-1 leading-relaxed">{clause.content.substring(0, 120)}...</p>
+                                      </div>
+                                  ))}
+                              </div>
+                              
+                              {/* Template Name (Optional) */}
+                              <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                                  <label className="block text-xs font-bold mb-2 text-blue-800 uppercase tracking-wide">
+                                      💾 Optional: Save as Template
+                                  </label>
+                                  <input
+                                      type="text"
+                                      value={saveTemplateName}
+                                      onChange={e => setSaveTemplateName(e.target.value)}
+                                      placeholder="e.g. Service Agreement Template"
+                                      className="w-full px-3 py-2 text-sm border-2 border-blue-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary"
+                                  />
+                                  <p className="text-xs text-blue-700 mt-2">
+                                      Save as a template to reuse these clauses later
+                                  </p>
+                              </div>
+                          </div>
+                          
+                          <div className="flex flex-col gap-2 mt-6">
+                              {/* Primary Action: Add to Contract */}
+                              <button
+                                  onClick={handleAddAiClausesToContract}
+                                  className="w-full px-4 py-3 bg-grit-primary text-white rounded font-bold hover:bg-grit-dark transition-colors flex items-center justify-center gap-2"
+                              >
+                                  <CheckCircle2 size={18} />
+                                  Add to Contract
+                              </button>
+                              
+                              {/* Secondary Action: Save as Template */}
+                              {saveTemplateName.trim() && (
+                                  <button
+                                      onClick={handleSaveAiAsTemplate}
+                                      className="w-full px-4 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                                  >
+                                      <Package size={18} />
+                                      Save as Template "{saveTemplateName}"
+                                  </button>
+                              )}
+                              
+                              {/* Tertiary Action: Discard */}
+                              <button
+                                  onClick={handleDiscardAiItems}
+                                  className="w-full px-4 py-2 border-2 border-gray-300 rounded font-bold text-gray-700 hover:bg-gray-100 transition-colors"
+                              >
+                                  Discard
+                              </button>
+                          </div>
+                      </>
+                  )}
               </div>
           </div>
       )}
