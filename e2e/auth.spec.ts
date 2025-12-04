@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
 
+// Test credentials from environment variables
+const TEST_EMAIL = process.env.TEST_USER_EMAIL || 'test@gritdocs.com';
+const TEST_PASSWORD = process.env.TEST_USER_PASSWORD || 'testpassword123';
+
 test.describe('Authentication', () => {
   test('should sign up a new user', async ({ page }) => {
     await page.goto('/');
@@ -14,7 +18,7 @@ test.describe('Authentication', () => {
     
     if (await emailInput.isVisible()) {
       await emailInput.fill(`test-${Date.now()}@example.com`);
-      await passwordInput.fill('TestPassword123!');
+      await passwordInput.fill(TEST_PASSWORD);
       
       // Click sign up button
       const signUpButton = page.getByRole('button', { name: /sign up|register/i });

@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
 
+// Test credentials from environment variables
+const TEST_EMAIL = process.env.TEST_USER_EMAIL || 'test@gritdocs.com';
+const TEST_PASSWORD = process.env.TEST_USER_PASSWORD || 'testpassword123';
+
 // Helper function to login
 async function login(page) {
   await page.goto('/');
@@ -8,8 +12,8 @@ async function login(page) {
   const passwordInput = page.getByPlaceholder(/password/i);
   
   if (await emailInput.isVisible()) {
-    await emailInput.fill('test@gritdocs.com');
-    await passwordInput.fill('testpassword123');
+    await emailInput.fill(TEST_EMAIL);
+    await passwordInput.fill(TEST_PASSWORD);
     
     const loginButton = page.getByRole('button', { name: /sign in|log in/i });
     await loginButton.click();
