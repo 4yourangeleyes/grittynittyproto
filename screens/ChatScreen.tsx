@@ -147,13 +147,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
       
       setIsProcessingNapkin(true);
       try {
-          const result = await generateDocumentContent(sanitized, DocType.INVOICE, clientName, profile.companyName);
+          const result = await generateDocumentContent(sanitized, DocType.INVOICE, clientName, profile.companyName, profile.industry);
           if (result.items) {
               const newItems = result.items.map((i: any) => ({...i, id: Math.random().toString()}));
-              setJobItems(prev => [...prev, ...newItems]);
-              setLastAiGeneratedItems(newItems); // Track AI-generated items
+              
+              // IMPROVED UX: Show items in preview modal first (don't auto-add to job)
+              setLastAiGeneratedItems(newItems);
+              setShowSaveTemplateModal(true); // Open preview modal
+              setSaveTemplateName(result.title || 'AI Generated Template'); // Pre-fill name
+              
               setNapkinText('');
-              setScopeMode('manual');
               triggerHaptic('success');
           }
       } catch (e) {
@@ -163,13 +166,13 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
       }
   };
 
-  const handleSaveAiAsTemplate = () => {
+  const handleSaveAiAsTemplate = async () => {
       if (!saveTemplateName.trim() || lastAiGeneratedItems.length === 0) return;
       
       const newTemplate: TemplateBlock = {
           id: `template-${Date.now()}`,
           name: saveTemplateName,
-          category: saveTemplateCategory,
+          category: saveTemplateCategory || profile.industry || 'Custom',
           type: DocType.INVOICE,
           items: lastAiGeneratedItems.map(item => ({
               ...item,
@@ -177,13 +180,39 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
           }))
       };
       
+      // Save to database via useTemplates hook (if available)
+      // For now, save to local state
       setTemplates(prev => [...prev, newTemplate]);
+      
       setShowSaveTemplateModal(false);
       setSaveTemplateName('');
-      setSaveTemplateCategory('Custom');
+      setSaveTemplateCategory('');
       setLastAiGeneratedItems([]);
       triggerHaptic('success');
       alert(`Template "${saveTemplateName}" saved! You can now reuse it from the Templates section.`);
+  };
+  
+  const handleAddAiItemsToJob = () => {
+      if (lastAiGeneratedItems.length === 0) return;
+      
+      // Add AI-generated items to current job
+      setJobItems(prev => [...prev, ...lastAiGeneratedItems]);
+      
+      setShowSaveTemplateModal(false);
+      setSaveTemplateName('');
+      setSaveTemplateCategory('');
+      setLastAiGeneratedItems([]);
+      setScopeMode('manual'); // Return to manual mode
+      triggerHaptic('success');
+  };
+  
+  const handleDiscardAiItems = () => {
+      setShowSaveTemplateModal(false);
+      setSaveTemplateName('');
+      setSaveTemplateCategory('');
+      setLastAiGeneratedItems([]);
+      setScopeMode('manual');
+      triggerHaptic('light');
   };
 
   const toggleTemplateItemSelection = (templateId: string, itemId: string) => {
@@ -557,69 +586,89 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ clients, setClients, profile, o
           )}
       </div>
       
-      {/* Save Template Modal */}
+      {/* AI Preview & Template Save Modal */}
       {showSaveTemplateModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
-                  <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                      <Package className="text-green-600" size={24} />
-                      Save AI Template
+                  <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
+                      <Sparkles className="text-grit-primary" size={24} />
+                      AI Generated Items
                   </h3>
                   <p className="text-sm text-gray-600 mb-4">
-                      Save these {lastAiGeneratedItems.length} AI-generated items as a reusable template.
+                      Review {lastAiGeneratedItems.length} AI-generated {lastAiGeneratedItems.length === 1 ? 'item' : 'items'} and choose what to do:
                   </p>
                   
                   <div className="space-y-4">
-                      <div>
-                          <label className="block text-sm font-bold mb-2">Template Name *</label>
+                      {/* Preview Items */}
+                      <div className="bg-gray-50 p-3 rounded border-2 border-gray-200 max-h-60 overflow-y-auto">
+                          <p className="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wide">Generated Items:</p>
+                          {lastAiGeneratedItems.map((item, idx) => (
+                              <div key={idx} className="bg-white p-2 rounded mb-2 border border-gray-200">
+                                  <p className="text-sm font-bold text-gray-800">{item.description}</p>
+                                  <p className="text-xs text-gray-600 mt-1">
+                                      {item.quantity} {item.unitType} × {profile.currency}{item.price.toFixed(2)} = <span className="font-bold">{profile.currency}{(item.quantity * item.price).toFixed(2)}</span>
+                                  </p>
+                              </div>
+                          ))}
+                          <div className="mt-3 pt-3 border-t border-gray-300">
+                              <p className="text-sm font-bold text-gray-800">
+                                  Total: <span className="text-grit-primary text-lg">{profile.currency}{lastAiGeneratedItems.reduce((sum, i) => sum + (i.quantity * i.price), 0).toFixed(2)}</span>
+                              </p>
+                          </div>
+                      </div>
+                      
+                      {/* Template Name (Optional) */}
+                      <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                          <label className="block text-xs font-bold mb-2 text-blue-800 uppercase tracking-wide">
+                              💾 Optional: Save as Template
+                          </label>
                           <input
                               type="text"
                               value={saveTemplateName}
                               onChange={e => setSaveTemplateName(e.target.value)}
-                              placeholder="e.g. Emergency Plumbing Service"
-                              className="w-full px-4 py-2 border-2 border-gray-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary"
-                              autoFocus
+                              placeholder="e.g. Kitchen Sink Repair"
+                              className="w-full px-3 py-2 text-sm border-2 border-blue-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary mb-2"
                           />
-                      </div>
-                      
-                      <div>
-                          <label className="block text-sm font-bold mb-2">Category</label>
                           <input
                               type="text"
                               value={saveTemplateCategory}
                               onChange={e => setSaveTemplateCategory(e.target.value)}
-                              placeholder="e.g. Plumber, Electrician"
-                              className="w-full px-4 py-2 border-2 border-gray-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary"
+                              placeholder={`Category (default: ${profile.industry || 'Custom'})`}
+                              className="w-full px-3 py-2 text-sm border-2 border-blue-300 rounded focus:border-grit-primary focus:ring-2 focus:ring-grit-primary"
                           />
-                      </div>
-                      
-                      <div className="bg-gray-50 p-3 rounded border-2 border-gray-200 max-h-40 overflow-y-auto">
-                          <p className="text-xs font-bold text-gray-500 mb-2">Items to Save:</p>
-                          {lastAiGeneratedItems.map((item, idx) => (
-                              <div key={idx} className="text-xs text-gray-700 mb-1">
-                                  • {item.description} ({item.quantity} {item.unitType} × {profile.currency}{item.price})
-                              </div>
-                          ))}
+                          <p className="text-xs text-blue-700 mt-2">
+                              Save as a template to reuse these items later
+                          </p>
                       </div>
                   </div>
                   
-                  <div className="flex gap-3 mt-6">
+                  <div className="flex flex-col gap-2 mt-6">
+                      {/* Primary Action: Add to Current Job */}
                       <button
-                          onClick={() => {
-                              setShowSaveTemplateModal(false);
-                              setSaveTemplateName('');
-                              setSaveTemplateCategory('Custom');
-                          }}
-                          className="flex-1 px-4 py-2 border-2 border-gray-300 rounded font-bold hover:bg-gray-100 transition-colors"
+                          onClick={handleAddAiItemsToJob}
+                          className="w-full px-4 py-3 bg-grit-primary text-white rounded font-bold hover:bg-grit-dark transition-colors flex items-center justify-center gap-2"
                       >
-                          Cancel
+                          <CheckCircle2 size={18} />
+                          Add to Current Job
                       </button>
+                      
+                      {/* Secondary Action: Save as Template */}
+                      {saveTemplateName.trim() && (
+                          <button
+                              onClick={handleSaveAiAsTemplate}
+                              className="w-full px-4 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                          >
+                              <Package size={18} />
+                              Save as Template "{saveTemplateName}"
+                          </button>
+                      )}
+                      
+                      {/* Tertiary Action: Discard */}
                       <button
-                          onClick={handleSaveAiAsTemplate}
-                          disabled={!saveTemplateName.trim()}
-                          className="flex-1 px-4 py-2 bg-grit-primary text-white rounded font-bold hover:bg-grit-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={handleDiscardAiItems}
+                          className="w-full px-4 py-2 border-2 border-gray-300 rounded font-bold text-gray-700 hover:bg-gray-100 transition-colors"
                       >
-                          Save Template
+                          Discard
                       </button>
                   </div>
               </div>
