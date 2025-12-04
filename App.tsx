@@ -11,6 +11,7 @@ import { useClients } from './hooks/useClients';
 import { useTemplates } from './hooks/useTemplates';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { DocumentCreationWizard } from './components/DocumentCreationWizard';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { ContractType } from './types';
 import { getClausesForContractType } from './services/clauseLibrary';
 import * as Sentry from '@sentry/react';
@@ -472,6 +473,9 @@ const AppRoutes: React.FC<any> = (props) => {
         onAddClient={saveClient}
       />
     )}
+
+    {/* PWA Install Prompt */}
+    <PWAInstallPrompt />
     </>
   );
 }

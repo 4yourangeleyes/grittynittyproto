@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - GritDocs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #F5F5FF;
+            color: #424242;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 32px;
+            background: #48CFCB;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            color: white;
+            box-shadow: 4px 4px 0px 0px #424242;
+        }
+        
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 16px 32px;
+            background: #48CFCB;
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            border: 2px solid #424242;
+            box-shadow: 4px 4px 0px 0px #424242;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px #424242;
+        }
+        
+        .status {
+            margin-top: 24px;
+            padding: 12px;
+            background: #fff;
+            border: 2px solid #424242;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .offline {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        
+        .online {
+            color: #16a34a;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📶</div>
+        <h1>You're Offline</h1>
+        <p>
+            It looks like you've lost your internet connection. 
+            GritDocs needs to be online to create and sync documents.
+        </p>
+        <button class="button" onclick="location.reload()">Try Again</button>
+        
+        <div class="status">
+            Connection status: <span id="status" class="offline">Offline</span>
+        </div>
+    </div>
+    
+    <script>
+        // Monitor online/offline status
+        function updateStatus() {
+            const statusEl = document.getElementById('status');
+            if (navigator.onLine) {
+                statusEl.textContent = 'Online';
+                statusEl.className = 'online';
+                // Auto-reload when back online
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                statusEl.textContent = 'Offline';
+                statusEl.className = 'offline';
+            }
+        }
+        
+        window.addEventListener('online', updateStatus);
+        window.addEventListener('offline', updateStatus);
+        
+        updateStatus();
+    </script>
+</body>
+</html>
