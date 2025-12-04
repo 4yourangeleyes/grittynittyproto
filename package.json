@@ -8,7 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "setup-northcell": "tsx setup-northcell-account.ts",
-    "setup-complete": "tsx setup-northcell-complete.ts"
+    "setup-complete": "tsx setup-northcell-complete.ts",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
@@ -23,6 +26,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@supabase/supabase-js": "^2.86.0",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
