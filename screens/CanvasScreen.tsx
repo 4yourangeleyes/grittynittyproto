@@ -507,7 +507,14 @@ const CanvasScreen: React.FC<CanvasScreenProps> = ({ doc, profile, updateDoc, te
         </div>
       )}
 
-      <div ref={invoiceRef} className={`bg-white print:border-0 print:shadow-none print:overflow-visible relative ${viewMode === 'Final' ? 'border-0 shadow-2xl' : 'border-4 border-grit-dark'}`} style={{ minHeight: '1123px', zoom: `${zoom}`, transformOrigin: 'top center' }}>
+      <div ref={invoiceRef} className={`bg-white print:border-0 print:shadow-none print:overflow-visible relative ${viewMode === 'Final' ? 'border-0 shadow-2xl' : 'border-4 border-grit-dark'}`} style={{ 
+        width: '794px', 
+        minHeight: '1123px',
+        maxHeight: viewMode === 'Final' ? '1123px' : 'none',
+        overflow: viewMode === 'Final' ? 'hidden' : 'visible',
+        zoom: `${zoom}`, 
+        transformOrigin: 'top center'
+      }}>
         {/* Preview mode styling - simulates print appearance */}
         {viewMode === 'Final' && (
           <style dangerouslySetInnerHTML={{ __html: `
