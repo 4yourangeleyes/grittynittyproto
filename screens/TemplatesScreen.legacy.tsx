@@ -5,7 +5,6 @@ import { Button } from '../components/Button';
 import { TemplateBlock, DocType, InvoiceItem, ContractClause, ContractType, UserProfile } from '../types';
 import { triggerHaptic } from '../App';
 import { generateDocumentContent } from '../services/geminiService';
-import { sanitizeInput, sanitizeNumeric, containsInjection } from '../services/securityService';
 
 interface TemplatesScreenProps {
   templates: TemplateBlock[];
@@ -23,11 +22,6 @@ const UNIT_TYPES = [
   { value: 'day', label: 'Days' },
 ];
 
-const MAX_NAME_LENGTH = 100;
-const MAX_CATEGORY_LENGTH = 50;
-const MAX_DESCRIPTION_LENGTH = 500;
-const MAX_CLAUSE_CONTENT_LENGTH = 5000;
-
 const TemplatesScreen: React.FC<TemplatesScreenProps> = ({ templates, saveTemplate, deleteTemplate, profile }) => {
   const navigate = useNavigate();
   
@@ -40,8 +34,6 @@ const TemplatesScreen: React.FC<TemplatesScreenProps> = ({ templates, saveTempla
   const [templateName, setTemplateName] = useState('');
   const [templateCategory, setTemplateCategory] = useState('');
   const [contractType, setContractType] = useState<ContractType>(ContractType.SERVICE_AGREEMENT);
-  const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
   
   // Invoice Items State (for invoice templates)
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
@@ -73,23 +65,14 @@ const TemplatesScreen: React.FC<TemplatesScreenProps> = ({ templates, saveTempla
   }, {} as Record<string, TemplateBlock[]>);
 
   const handleAddInvoiceItem = () => {
-    if (!tempItemDesc.trim() || !tempItemPrice) {
-      setError('Please enter item description and price');
-      return;
-    }
-    
-    // Security: Check for injection attempts
-    if (containsInjection(tempItemDesc)) {
-      setError('Invalid characters detected in item description');
-      return;
-    }
+    if (!tempItemDesc || !tempItemPrice) return;
     
     const newItem: InvoiceItem = {
       id: `item-${Date.now()}-${Math.random()}`,
-      description: sanitizeInput(tempItemDesc, MAX_DESCRIPTION_LENGTH),
-      quantity: sanitizeNumeric(tempItemQty),
+      description: tempItemDesc,
+      quantity: parseFloat(tempItemQty) || 1,
       unitType: tempItemUnit,
-      price: sanitizeNumeric(tempItemPrice),
+      price: parseFloat(tempItemPrice) || 0,
     };
     
     setInvoiceItems([...invoiceItems, newItem]);
@@ -129,11 +112,9 @@ const TemplatesScreen: React.FC<TemplatesScreenProps> = ({ templates, saveTempla
     if (!aiPrompt.trim()) return;
     
     setIsGeneratingAI(true);
-    setError(null);
     try {
-      const sanitizedPrompt = sanitizeInput(aiPrompt, 1000);
       const result = await generateDocumentContent(
-        sanitizedPrompt,
+        aiPrompt,
         activeTab === 'invoice' ? DocType.INVOICE : DocType.CONTRACT,
         'Template Client',
         profile.companyName,
@@ -196,8 +177,8 @@ const TemplatesScreen: React.FC<TemplatesScreenProps> = ({ templates, saveTempla
 
     const newTemplate: TemplateBlock = {
       id: editingTemplate?.id || `template-${Date.now()}`,
-      name: sanitizeInput(templateName, MAX_NAME_LENGTH),
-      category: sanitizeInput(templateCategory || 'General', MAX_CATEGORY_LENGTH),
+      name: templateName,
+      category: templateCategory || 'General',
       type: activeTab === 'invoice' ? DocType.INVOICE : DocType.CONTRACT,
       items: activeTab === 'invoice' ? invoiceItems : undefined,
       clauses: activeTab === 'contract' ? contractClauses : undefined,
