@@ -19,7 +19,8 @@ import * as Sentry from '@sentry/react';
 // Lazy Load Screens for Performance
 const LoginScreen = lazy(() => import('./screens/LoginScreen'));
 const DashboardScreen = lazy(() => import('./screens/DashboardScreen'));
-const ChatScreen = lazy(() => import('./screens/ChatScreenConversational'));
+const TemplatesScreen = lazy(() => import('./screens/TemplatesScreen'));
+const QuickScreen = lazy(() => import('./screens/QuickScreen'));
 const CanvasScreen = lazy(() => import('./screens/CanvasScreen'));
 const SettingsScreen = lazy(() => import('./screens/SettingsScreen'));
 const ClientsScreen = lazy(() => import('./screens/ClientsScreen'));
@@ -155,7 +156,8 @@ const Layout: React.FC<{
         
         <nav className="flex flex-col gap-4">
           <button onClick={() => { navigate('/'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Dashboard</button>
-          <button onClick={() => { navigate('/chat'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">AI Chat</button>
+          <button onClick={() => { navigate('/quick'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Quick Create</button>
+          <button onClick={() => { navigate('/templates'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Templates</button>
           <button onClick={() => { setIsMenuOpen(false); onShowWizard(); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Create Document</button>
           <button onClick={() => { navigate('/documents'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Documents</button>
           <button onClick={() => { navigate('/clients'); setIsMenuOpen(false); }} className="text-left font-bold text-lg hover:text-grit-primary p-2 border-b border-gray-100">Clients</button>
@@ -411,7 +413,7 @@ const AppRoutes: React.FC<any> = (props) => {
                !isAuthenticated 
                   ? <Navigate to="/login" replace /> 
                   : documents.length === 0 
-                     ? <Navigate to="/chat" replace /> 
+                     ? <Navigate to="/quick" replace /> 
                      : <DashboardScreen documents={documents} clients={clients} profile={profile || INITIAL_PROFILE} onCloneLast={() => props.handleDuplicateLast(documents)} /> 
             } />
             
@@ -419,20 +421,30 @@ const AppRoutes: React.FC<any> = (props) => {
                !isAuthenticated 
                   ? <Navigate to="/login" replace />
                   : documents.length === 0 
-                     ? <Navigate to="/chat" replace /> 
+                     ? <Navigate to="/quick" replace /> 
                      : <DashboardScreen documents={documents} clients={clients} profile={profile || INITIAL_PROFILE} onCloneLast={() => props.handleDuplicateLast(documents)} /> 
             } />
             
-            <Route path="/chat" element={
+            <Route path="/quick" element={
                !isAuthenticated 
                   ? <Navigate to="/login" replace />
-                  : <ChatScreen 
+                  : <QuickScreen 
                        clients={clients} 
-                       setClients={setClients} 
                        profile={profile || INITIAL_PROFILE} 
-                       onDocGenerated={props.handleDocumentCreated} 
-                       templates={templates} 
-                       setTemplates={setTemplates}
+                       templates={templates}
+                       saveTemplate={saveTemplate}
+                       onDocGenerated={props.handleDocumentCreated}
+                    /> 
+            } />
+            
+            <Route path="/templates" element={
+               !isAuthenticated 
+                  ? <Navigate to="/login" replace />
+                  : <TemplatesScreen 
+                       templates={templates}
+                       saveTemplate={saveTemplate}
+                       deleteTemplate={deleteTemplate}
+                       profile={profile || INITIAL_PROFILE}
                     /> 
             } />
             
