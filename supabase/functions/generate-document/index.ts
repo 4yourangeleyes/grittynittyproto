@@ -4,6 +4,13 @@
 // @ts-ignore - This is a Deno Edge Function, not Node.js/Browser code
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
+// CORS headers for all responses
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
+
 // Types
 interface GenerateDocumentRequest {
   prompt: string
@@ -164,14 +171,10 @@ async function checkRateLimit(userId: string, action: string, limit: number, win
 }
 
 serve(async (req: Request) => {
-  // CORS headers
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
+      headers: corsHeaders,
     })
   }
 
@@ -179,7 +182,13 @@ serve(async (req: Request) => {
   if (req.method !== 'POST') {
     return new Response(
       JSON.stringify({ error: 'Method not allowed' }),
-      { status: 405, headers: { 'Content-Type': 'application/json' } }
+      { 
+        status: 405, 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        } 
+      }
     )
   }
 

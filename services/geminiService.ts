@@ -26,8 +26,10 @@ export const generateDocumentContent = async (
         .filter(t => t.type === docType)
         .slice(0, 5) // Only send top 5 templates to avoid token limits
         .map(t => {
-          const itemList = t.items?.slice(0, 10).map(i => 
-            `  - ${i.description}: R${i.price} (${i.quantity} ${i.unitType})`
+          // Safely handle items array
+          const itemsArray = Array.isArray(t.items) ? t.items : [];
+          const itemList = itemsArray.slice(0, 10).map(i => 
+            `  - ${i.description}: R${i.price || i.unitPrice || 0} (${i.quantity} ${i.unitType})`
           ).join('\n') || '';
           return `${t.name} (${t.category}):\n${itemList}`;
         })
